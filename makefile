@@ -6,21 +6,23 @@ SRC 		=  $(wildcard ./src/*.cpp)
 OBJ 		=  $(wildcard ./src/*.o)
 INCLUDE		= -I./include
 LIB			= 
+EXE			= KidHttpd
 
 #------------------------------------------------------------------------------
 
 include $(patsubst %.cpp,%.d,$(SRC))
 
 
-all: KidHttpd
+all: $(EXE)
 
-KidHttpd: $(OBJ)
+$(EXE): $(OBJ)
 	$(CXX) $(OBJ) -o KidHttpd  
 
 clean:
 	@echo 'clean the project'
 	-rm $(patsubst %.cpp,%.d,$(SRC))
 	-rm $(patsubst %.cpp,%.o,$(SRC))
+	-rm $(EXE)
 
 .PHONY: clean
 
