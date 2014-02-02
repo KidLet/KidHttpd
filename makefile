@@ -3,17 +3,16 @@ CXX         = g++
 CFLAGS      += -g -fPIC -Wno-deprecated -Wall
 
 SRC 		=  $(wildcard ./src/*.cpp)
-OBJ 		=  $(wildcard ./src/*.o)
+OBJ 		=  $(patsubst %.cpp,%.o,$(SRC))
 INCLUDE		= -I./include
 LIB			= 
 EXE			= KidHttpd
 
 #------------------------------------------------------------------------------
 
-include $(patsubst %.cpp,%.d,$(SRC))
-
-
 all: $(EXE)
+
+include $(patsubst %.cpp,%.d,$(SRC))
 
 $(EXE): $(OBJ)
 	$(CXX) $(OBJ) -o KidHttpd  
