@@ -10,6 +10,7 @@ private:
     static T* _pInstance;
     singleton(){};
 
-}
+};
 
+singleton<T>::_pInstance = NULL;
 #endif
