@@ -26,7 +26,13 @@ private:
 
 };
 
-template<class T>
+template <class T>
 T* Singleton<T>::_pInstance = NULL;
+
+template <class T>
+T* Singleton<T>::getInstance()
+{
+    return new T;
+}
 
 #endif

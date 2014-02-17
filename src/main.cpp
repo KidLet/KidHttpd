@@ -13,7 +13,7 @@
 
 int main()
 {
-    printf("%d", Server::getInstance());
+    Server::getInstance();
     return 0;
 }
 

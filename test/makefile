@@ -24,7 +24,6 @@ main		=  ./../src/main.o
 	@echo $(filter-out %main.o, $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp)))
 	@echo $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp))
 	$(CXX) $^ -o $@ $(INCLUDE) $(LIB_DIR) $(LIB)
-	echo '234'
 
 clean:
 	@echo 'clean the project'
