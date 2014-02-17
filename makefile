@@ -1,12 +1,12 @@
-CC          = gcc
-CXX         = g++
-CFLAGS      += -g -fPIC -Wno-deprecated -Wall
+CC          	=  gcc
+CXX         	=  g++
+CFLAGS      	+= -g -fPIC -Wno-deprecated -Wall
 
 SRC 		=  $(wildcard ./src/*.cpp)
 OBJ 		=  $(patsubst %.cpp,%.o,$(SRC))
-INCLUDE		= -I./include
-LIB			= 
-EXE			= KidHttpd
+INCLUDE		=  -I./include
+LIB		=  -lpthread 
+EXE		=  KidHttpd
 
 #------------------------------------------------------------------------------
 
@@ -31,8 +31,8 @@ clean:
 
 %.d: %.cpp
 		@echo "update $@ ..."; \
-				echo -n $< | sed s/\.cpp/\.o:/ > $@; \
-					$(CC) $(INCLUDE) -MM $< | sed '1s/.*.://' >> $@;
+		echo -n $< | sed s/\.cpp/\.o:/ > $@; \
+		$(CC) $(INCLUDE) -MM $< | sed '1s/.*.://' >> $@;
 
 %.o: %.cpp
 		$(CXX) $(CFLAGS) $(INCLUDE) -o $@ -c $<
