@@ -1,8 +1,12 @@
 #include "gtest/gtest.h"
+#include "singleton.h"
 
-TEST(singleton, singleton_unique)
+class A : public Singleton<A>{};
+
+//检查 单例的唯一性
+TEST(singleton, unique)
 {
-    ASSERT_EQ(0, 1);
+    ASSERT_EQ(A::getInstance(), new A);
 }
 
 int main(int argc, char **argv)
