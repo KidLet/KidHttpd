@@ -11,6 +11,7 @@
 #define __SINGLETON_H__
 
 #include "common.h"
+#include <unistd.h>
 
 template <class T>
 class Singleton
@@ -32,7 +33,13 @@ T* Singleton<T>::_pInstance = NULL;
 template <class T>
 T* Singleton<T>::getInstance()
 {
-    return new T;
+    if(_pInstance == NULL)
+    {
+	usleep(10000);
+	return (_pInstance = new T);	
+    }
+    else
+	return _pInstance;
 }
 
 #endif

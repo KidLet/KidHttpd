@@ -18,11 +18,10 @@ all: $(EXE)
 
 include $(patsubst %.cpp, %.d, $(SRC))
 
-main		=  ./../src/main.o
 
 %.test: %.o $(filter-out ./../src/main.o, $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp)))
-	@echo $(filter-out %main.o, $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp)))
-	@echo $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp))
+#	@echo $(filter-out %main.o, $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp)))
+#	@echo $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp))
 	$(CXX) $^ -o $@ $(INCLUDE) $(LIB_DIR) $(LIB)
 
 clean:
