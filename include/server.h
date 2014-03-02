@@ -4,24 +4,39 @@
  *
  * 当前版本：1.0
  * 作者：KidLet
- * 完成日期：2014年2月17日
+ * 日期：2014年2月17日
  *
  */
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
 #include "singleton.h"
+#include "configure.h"
+#include "access.h"
+
+enum STATUS
+{
+    INIT,
+    STARTED,
+    STOPED
+};
+
 
 class Server : public Singleton<Server>
 {
 public:
-    //void start();
-    //void stop();
+    int start();
+    int stop();
 
-    Server(){};
+    Server();
+    ~Server();
     
-
+private:
+    Conf _configure;
+    bool _status;
+    Access* _accessor;
 
 };
+
 
 #endif

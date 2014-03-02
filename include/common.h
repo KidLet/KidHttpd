@@ -4,12 +4,17 @@
  *
  * 当前版本：1.0
  * 作者：KidLet
- * 完成日期：2014年2月17日
+ * 日期：2014年2月17日
  *
  */
 
 #ifndef __COMMON_H__
 #define __COMMON_H__
+
+#include <iostream>
+#include <string>
+using namespace std;
+
 
 #ifndef NULL
 #define NULL 0

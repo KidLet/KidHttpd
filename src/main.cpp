@@ -13,7 +13,8 @@
 
 int main()
 {
-    Server::getInstance();
+    
+    Server::getInstance()->start();
     return 0;
 }
 
