@@ -19,27 +19,31 @@ class Socket
 {
 public:
     Socket(int iType = SOCK_STREAM, int iDomain = AF_INET);
-    Socket(int iFd);
     Socket();
     ~Socket();
+    void init(int iFd, bool bIsOwner = true, int iDomain = AF_INET);
+    int create(int iType = SOCK_STREAM, int iDomain = AF_INET);
+
     int connect(const string& sIp, unsigned int iPort);
     int accept(Socket& client);
     int bind(const string& sBindIp, unsigned int iPort);
-    int listen(int iBackLog);
+    int listen(int iBackLog = 1024);
+
     int recv(void* pvBuf, size_t iLen);
     int send(void* pvBuf, size_t iLen);
-    int getFd();
-    int close();
-    int shutdown();
-    int create(int iType = SOCK_STREAM, int iDomain = AF_INET);
-    void setOwner(bool isOwner = true);
+
     static int parseAddr(const string& sAddr, struct in_addr& stInAddr);
+    
+    int getFd();
+    void setOwner(bool isOwner = true);
+
+    int close();
+    int shutdown(int iHow = SHUT_RDWR);
     
 private:
     int iFd_;
     bool bIsOwner_;
     int iDomain_;
-    int iType_;
     
 };
 

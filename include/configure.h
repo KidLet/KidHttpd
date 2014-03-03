@@ -25,8 +25,8 @@ public:
     bool loadFile();
 
     Conf(string path="./www", unsigned short port=80)
-	: _path(path), _port(port)
-    {cout << "Conf start:" << port << endl;}
+		: _path(path), _port(port)
+		{cout << "Conf start:" << port << endl;}
 
 private:
     string _path;
