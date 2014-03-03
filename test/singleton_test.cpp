@@ -33,7 +33,7 @@ TEST(Singleton, Unique_MulitiThread)
     
     for(int i=0; i<20000; i++)
     {
-	void** ptr;
+	void** ptr = NULL;
 	pthread_join(aTids[i], ptr);
 	if(i == 0)
 	{
