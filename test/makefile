@@ -2,14 +2,14 @@ CC          	=  gcc
 CXX         	=  g++
 CFLAGS      	+= -g -fPIC -Wno-deprecated -Wall
 
-SRC 		=  $(wildcard ./*.cpp)
-OBJ 		=  $(patsubst %.cpp, %.o, $(SRC))
-EXE		=  $(patsubst %.cpp, %.test, $(SRC))
+SRC 			=  $(wildcard ./*.cpp)
+OBJ 			=  $(patsubst %.cpp, %.o, $(SRC))
+EXE				=  $(patsubst %.cpp, %.test, $(SRC))
 
-INCLUDE		=  -I./../include
+INCLUDE			=  -I./../include
 
-LIB		=  -lpthread -lgtest
-LIB_DIR		=  -L./../lib
+LIB				=  -lpthread -lgtest
+LIB_DIR			=  -L./../lib
 
 
 #------------------------------------------------------------------------------
