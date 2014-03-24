@@ -62,7 +62,7 @@ void Socket::init(int iFd, bool bIsOwner, int iDomain)
     iDomain_ = iDomain;
 }
 
-int Socket::create(int iType = SOCK_STREAM, int iDomain = AF_INET)
+int Socket::create(int iType, int iDomain)
 {
     if(iFd_ != -1)
     {
@@ -76,6 +76,7 @@ int Socket::create(int iType = SOCK_STREAM, int iDomain = AF_INET)
     {
         bIsOwner_ = true;
     }
+    return iFd_;
     
 }
 
