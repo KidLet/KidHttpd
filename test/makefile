@@ -26,26 +26,12 @@ include $(patsubst %.cpp, %.d, $(SRC))
 
 clean:
 	@echo 'clean the project'
-	@rm $(patsubst %.cpp,%.d,$(SRC))
-	@rm $(patsubst %.cpp,%.o,$(SRC))
-	@rm $(EXE)
+	@rm -f $(patsubst %.cpp,%.d,$(SRC))
+	@rm -f $(patsubst %.cpp,%.o,$(SRC))
+	@rm -f $(EXE)
 
 .PHONY: clean
 
 
-#-------------------------------------------------------------------------------
-
-
-%.d: %.cpp
-		@echo "update $@ ..."; \
-		echo -n $< | sed s/\.cpp/\.o:/ > $@; \
-		$(CC) $(INCLUDE) -MM $< | sed '1s/.*.://' >> $@;
-
-%.o: %.cpp
-		$(CXX) $(CFLAGS) $(INCLUDE) -o $@ -c $<
-
-
-%.o: %.c
-		$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
-
+-include ../make.rules
 
