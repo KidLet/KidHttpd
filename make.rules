@@ -1,6 +1,5 @@
 %.d: %.cpp
-		@echo "更新 $@ ..."; \
-		echo -n $< | sed s/\.cpp/\.o:/ > $@; \
+		@echo -n $< | sed s/\.cpp/\.o:/ > $@; \
 		$(CC) $(INCLUDE) -MM $< | sed '1s/.*.://' >> $@;
 
 %.o: %.cpp
