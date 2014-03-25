@@ -7,26 +7,65 @@
  * 日期：2014年3月2日
  *
  */
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include "access.h"
+#include <sys/epoll.h>
 
+static int epollFd = 0;
 
-Access::Access(Conf* configure)
+Access::Access()
+        :listenFd_(SOCK_STREAM, AF_INET)
 {
-    struct sockaddr_in servaddr;
-    int opt = 1;
+    epollFd = epoll_create(0);
+    status_ = STOP;
+}
 
-    _listen = socket(AF_INET, SOCK_STREAM, 0);
-    setsockopt(_listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+int Access::bind()
+{
+    cout << listenFd_.bind("127.0.0.1", 8080) << endl;
+    listenFd_.listen(1024);
+}
 
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(configure->getPort());
+int Access::listen()
+{
+    if(listenFd_.getFd() < 0)
+        return -1;
+
+    if(status_ == START)
+        return 0;
+
+    struct epoll_event stEv;
+    struct epoll_event stEv_Array[MAX_EVENTS];
+    struct Conn conn;
     
+    int iNumFds = 0;
 
-    bind(_listen, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    stEv.events = EPOLLIN;
+    stEv.data.fd = listenFd_.getFd();
 
-    listen(_listen, 100);
+    epoll_ctl(epollFd, EPOLL_CTL_ADD, listenFd_.getFd(), &stEv);
+    
+    while(status_ == START)
+    {
+        iNumFds = epoll_wait(epollFd, stEv_Array, MAX_EVENTS, -1);
+
+        for(int i=0; i<iNumFds; i++)
+        {
+            if(stEv_Array[i].data.fd == listenFd_.getFd()) //为接入连接Fd，有新连接到来
+            {
+                listenFd_.accept(conn.sock);
+
+                stEv.events = EPOLLIN | EPOLLET;
+                stEv.data.fd = conn.sock.getFd();
+                epoll_ctl(epollFd, EPOLL_CTL_ADD, listenFd_.getFd(), &stEv);
+                
+            }
+            else
+            {
+                
+            }
+                
+        }
+    }
+
+    return 0;
 }

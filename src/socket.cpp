@@ -7,6 +7,7 @@
  * 日期：2014年3月24日
  *
  */
+#include "common.h"
 #include "socket.h"
 #include <arpa/inet.h>  // for inet_aton
 #include <netinet/in.h> // for sockaddr_in
@@ -24,8 +25,8 @@ Socket::Socket(int iType, int iDomain)
     iFd_ = -1;
     bIsOwner_ = false;
 
-    iFd_ = socket(iType, iDomain, 0);
-    iDomain = iDomain_;
+    iFd_ = socket(iDomain, iType, 0);
+    iDomain_ = iDomain;
 
     if(iFd_ >=0)
     {
@@ -69,8 +70,8 @@ int Socket::create(int iType, int iDomain)
         Socket::close();
     }
 
-    iFd_ = socket(iType, iDomain, 0);
-    iDomain = iDomain_;
+    iFd_ = socket(iDomain, iType, 0);
+    iDomain_ = iDomain;
 
     if(iFd_ >=0)
     {
@@ -127,8 +128,10 @@ int Socket::bind(const string& sBindIp, unsigned int iPort)
 
     bzero(&stSockAddrIn, sizeof(stSockAddrIn));
     parseAddr(sBindIp, stSockAddrIn.sin_addr);
+
     stSockAddrIn.sin_family = iDomain_;
-    stSockAddrIn.sin_port = htons(iPort);
+    stSockAddrIn.sin_port = htons( (uint16_t)iPort);
+
     
     int iRet = ::bind(iFd_, (struct sockaddr*) &stSockAddrIn, sizeof(stSockAddrIn));
     return iRet;

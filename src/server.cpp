@@ -24,7 +24,9 @@ Server::~Server()
 
 int Server::start()
 {
-    _accessor = new Access(&_configure);
+    _accessor = new Access();
+    _accessor->bind();
+    _accessor->listen();
 
     while(_status != STOPED)
     {
@@ -32,7 +34,5 @@ int Server::start()
     }
     
     
-    
-    _status = STARTED;
     return 0;
 }

@@ -11,14 +11,33 @@
 #define __ACCESS_H__
 
 #include "common.h"
-#include "configure.h"
+#include "socket.h"
+
+enum
+{
+    START,
+    STOP
+};
+
+const int MAX_EVENTS = 1024;
 
 class Access
 {
 public:
-    Access(Conf* configure);
+    Access();
+    int listen();
+    int bind();
+
 private:
-    int _listen;
+    Socket listenFd_;
+    int status_;
+};
+
+struct Conn
+{
+    Socket sock;
+    unsigned long long activeTimeStamp;
+    // to be add
 };
 
 

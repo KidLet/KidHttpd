@@ -18,7 +18,7 @@ using namespace std;
 class Socket
 {
 public:
-    Socket(int iType = SOCK_STREAM, int iDomain = AF_INET);
+    Socket(int iType, int iDomain);
     Socket();
     ~Socket();
     void init(int iFd, bool bIsOwner = true, int iDomain = AF_INET);
