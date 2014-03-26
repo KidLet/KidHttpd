@@ -8,6 +8,7 @@
  *
  */
 #include "access.h"
+#include "thread.h"
 #include <sys/epoll.h>
 
 static int epollFd = 0;
@@ -23,6 +24,7 @@ int Access::bind()
 {
     cout << listenFd_.bind("127.0.0.1", 8080) << endl;
     listenFd_.listen(1024);
+    return 0;
 }
 
 int Access::listen()

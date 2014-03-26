@@ -10,25 +10,27 @@
 #include <unistd.h>
 #include "server.h"
 
-Server::Server() : _configure("./www", 8000)
+Server::Server() : configure_("./www", 8000)
 {
-    _status = INIT;
-    _accessor = NULL;
+    status_ = INIT;
+    proxy_= NULL;
 }
 
 Server::~Server()
 {
-    if(_accessor != NULL)
-        delete _accessor;
+    if(proxy_ != NULL)
+        delete proxy_;
 }
 
 int Server::start()
 {
-    _accessor = new Access();
-    _accessor->bind();
-    _accessor->listen();
+    proxy_ = new Access();
 
-    while(_status != STOPED)
+    proxy_->start();
+    //_accessor->bind();
+    //_accessor->listen();
+
+    while(status_ != STOPED)
     {
         sleep(1);
     }

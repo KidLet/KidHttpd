@@ -32,9 +32,9 @@ public:
     ~Server();
     
 private:
-    Conf _configure;
-    bool _status;
-    Access* _accessor;
+    Conf configure_;
+    bool status_;
+    Access* proxy_;
 
 };
 

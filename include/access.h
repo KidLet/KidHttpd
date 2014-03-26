@@ -12,6 +12,7 @@
 
 #include "common.h"
 #include "socket.h"
+#include "thread.h"
 
 enum
 {
@@ -21,12 +22,13 @@ enum
 
 const int MAX_EVENTS = 1024;
 
-class Access
+class Access : public Thread
 {
 public:
     Access();
     int listen();
     int bind();
+    void run(){while(1)sleep(1); cout << "i am run" << endl;}
 
 private:
     Socket listenFd_;
