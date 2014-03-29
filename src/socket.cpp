@@ -43,6 +43,12 @@ Socket::~Socket()
     }
 }
 
+int Socket::setReUse(bool bIsReUse)
+{
+    int opt = 1;
+    return setsockopt(iFd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+}
+
 void Socket::setOwner(bool bIsOwner)
 {
     if(iFd_ >= 0)

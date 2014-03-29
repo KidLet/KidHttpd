@@ -24,6 +24,8 @@ public:
     char* content;
     unsigned int activeTime;
 
+    ~Connection(){Debug<<"Connection out" << endl;}
+
     
 };
 

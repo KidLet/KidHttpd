@@ -6,6 +6,9 @@
  * 作者：KidLet
  * 日期：2014年3月23日
  *
+ * 历史:
+ *	2014-3-23 首次编写
+ *	2014-3-30 添加reuse接口
  */
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
@@ -23,6 +26,7 @@ public:
     ~Socket();
     void init(int iFd, bool bIsOwner = true, int iDomain = AF_INET);
     int create(int iType = SOCK_STREAM, int iDomain = AF_INET);
+    int setReUse(bool isReUse = true);
 
     int connect(const string& sIp, unsigned int iPort);
     int accept(Socket& client);
