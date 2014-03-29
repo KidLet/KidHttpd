@@ -28,19 +28,13 @@ public:
     Access();
     int listen();
     int bind();
-    void run(){while(1)sleep(1); cout << "i am run" << endl;}
+    void run();
 
 private:
     Socket listenFd_;
     int status_;
 };
 
-struct Conn
-{
-    Socket sock;
-    unsigned long long activeTimeStamp;
-    // to be add
-};
 
 
 #endif

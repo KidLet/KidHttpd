@@ -27,8 +27,6 @@ int Server::start()
     proxy_ = new Access();
 
     proxy_->start();
-    //_accessor->bind();
-    //_accessor->listen();
 
     while(status_ != STOPED)
     {

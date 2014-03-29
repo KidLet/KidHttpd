@@ -8,7 +8,7 @@
  *
  */
 #include "access.h"
-#include "thread.h"
+#include "connection.h"
 #include <sys/epoll.h>
 
 static int epollFd = 0;
@@ -22,9 +22,15 @@ Access::Access()
 
 int Access::bind()
 {
-    cout << listenFd_.bind("127.0.0.1", 8080) << endl;
+    cout << listenFd_.bind("0.0.0.0", 8080) << endl;
     listenFd_.listen(1024);
     return 0;
+}
+
+void Access::run()
+{
+    Access::bind();
+    Access::listen();
 }
 
 int Access::listen()
@@ -37,7 +43,7 @@ int Access::listen()
 
     struct epoll_event stEv;
     struct epoll_event stEv_Array[MAX_EVENTS];
-    struct Conn conn;
+    struct Connection* pConn;
     
     int iNumFds = 0;
 
@@ -54,16 +60,18 @@ int Access::listen()
         {
             if(stEv_Array[i].data.fd == listenFd_.getFd()) //为接入连接Fd，有新连接到来
             {
-                listenFd_.accept(conn.sock);
+                pConn = new Connection;
+                
+                listenFd_.accept(pConn->sock);
 
                 stEv.events = EPOLLIN | EPOLLET;
-                stEv.data.fd = conn.sock.getFd();
+                stEv.data.fd = pConn->sock.getFd();
                 epoll_ctl(epollFd, EPOLL_CTL_ADD, listenFd_.getFd(), &stEv);
                 
             }
             else
             {
-                
+               
             }
                 
         }
