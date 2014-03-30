@@ -7,6 +7,7 @@
 #include "access.h"
 #include "connection.h"
 #include <sys/epoll.h>
+#include <unistd.h>
 
 #include <vector>
 
