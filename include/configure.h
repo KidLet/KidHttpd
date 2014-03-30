@@ -6,6 +6,7 @@
  * 作者：KidLet
  * 日期：2014年3月2日
  *
+ *
  */
 #ifndef __CONFIGURE_H__
 #define __CONFIGURE_H__
