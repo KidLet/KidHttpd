@@ -11,7 +11,8 @@
 
 void Configure::parseFile(string filename, char delimeter, char comment)
 {
-	cout<<"parsing"<<endl;
+	//cout<<"parsing"<<endl;
+
 	ifstream ifs(filename);
 	string line = "", key, value;
 	string::size_type pos;
