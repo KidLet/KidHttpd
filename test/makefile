@@ -1,6 +1,6 @@
 CC          	=  gcc
 CXX         	=  g++
-CFLAGS      	+= -g -fPIC -Wno-deprecated -Wall
+CFLAGS      	+= -g -fPIC -Wno-deprecated -Wall -std=gnu++0x
 
 SRC 			=  $(wildcard ./*.cpp)
 OBJ 			=  $(patsubst %.cpp, %.o, $(SRC))
