@@ -24,10 +24,10 @@ class Configure {
 
 public:
 	Configure():delimeter_('='), comment_('#'){}
-	Configure(string filename, char delimeter='=', char comment='#');
+	Configure(string filename, char delimeter = '=', char comment = '#');
 
 
-	void parseFile(string filename, char delimeter='=', char comment='#'); //解析Conf文件
+	void parseFile(string filename, char delimeter = '=', char comment = '#'); //解析Conf文件
 	string trim(string str);	//去掉空格
 
 	string getValue(string key); 	//根据key返回value

@@ -11,24 +11,39 @@
 
 void Configure::parseFile(string filename, char delimeter, char comment)
 {
-	//cout<<"parsing"<<endl;
-
-	ifstream ifs(filename);
+	ifstream ifs(filename.c_str());
 	string line = "", key, value;
 	string::size_type pos;
-	while(ifs.eof()) {
-		cout<<"entering ifs"<<endl;
 
+	while(!ifs.eof()) {
 		getline(ifs, line);
 		if(line.empty() || line.at(0) == comment)
 			continue;
+
+		line = line.substr(0, line.find(comment));
+
 		if((pos = line.find(delimeter)) == string::npos)
 			continue;
-		key = trim(line.substr(0, pos));
-		value = trim(line.substr(pos+1, line.size() - pos + 1));
 
+		key = trim(line.substr(0, pos));
+		value = trim(line.substr(pos+1, line.size() - pos - 1));
+
+		/*while(value == ""){
+			cout<<"enter while:"<<endl;
+			string newline = "";
+			getline(ifs, newline);
+			if(newline.empty() || newline.at(0) == comment)
+				continue;
+			newline = newline.substr(0, line.find(comment));
+			cout<<"comment:"<<newline<<endl;
+			pos = newline.find(delimeter);
+
+			value = trim(newline.substr(pos + 1, newline.size() - pos - 1));
+			cout<<"delimeter:"<<value<<endl;
+		}*/
 		if(!key.empty())
 			conf_content[key] = value;
+
 	}
 	ifs.close();
 }
@@ -37,7 +52,7 @@ string Configure::trim(string str)
 {
 	if(str.empty())
 		return str;
-	static const char ignore[]  = "\n\r\t";
+	static const char ignore[]  = " \t\n\r\0\x0B";
 	string::size_type pos, pos2;
 	pos = str.find_first_not_of(ignore);
 	if(pos == string::npos)
