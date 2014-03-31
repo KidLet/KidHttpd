@@ -1,11 +1,10 @@
 /*
  * 文件名称：socket.cpp
  * 摘要：
- *
- * 当前版本：1.0
  * 作者：KidLet
- * 日期：2014年3月24日
  *
+ * 历史：
+ *  2013-3-24 首次编写
  */
 #include "common.h"
 #include "socket.h"

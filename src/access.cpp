@@ -1,7 +1,10 @@
 /*
  * 文件名称：access.cpp
  * 摘要：
+ * 作者：Kidlet
  *
+ * 历史：
+ *  2014-3-2 首次编写
  *
  */
 #include "access.h"

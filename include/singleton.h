@@ -1,11 +1,10 @@
 /*
  * 文件名称：singleton.h
  * 摘要：
- *
- * 当前版本：1.0
  * 作者：KidLet
- * 完成日期：2014年2月17日
  *
+ * 历史：
+ *  2014-3-2 首次编写
  */
 #ifndef __SINGLETON_H__
 #define __SINGLETON_H__
