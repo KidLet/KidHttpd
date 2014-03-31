@@ -23,28 +23,21 @@ using namespace std;
 class Configure {
 
 public:
-	Configure();
-	Configure(string filename, string delimeter="=", string comment="#");
+	Configure():delimeter_('='), comment_('#'){}
+	Configure(string filename, char delimeter='=', char comment='#');
 
 
-	void parseFile(string filename="/etc/httpd.conf", string delimeter="=", string comment="#"); //解析Conf文件
-	bool fileExists(string filename);
-	string trim(const string str);	//去掉空格
+	void parseFile(string filename, char delimeter='=', char comment='#'); //解析Conf文件
+	string trim(string str);	//去掉空格
 
 	string getValue(string key); 	//根据key返回value
-	bool keyExists(string key);
 
 	void render(); 	//输出结果
 
-	string getDelimeter() { return _delimeter; };
-	string getComment(){ return _comment; };
-	void setDelimeter(string delimeter) { _delimeter = delimeter; };
-	void setComment(string comment) {_comment = comment; };
-
 private:
 	map<string, string> conf_content;	//保存配置文件的key-value键值对
-	string _delimeter;	//key-value之间的分隔符
-	string _comment; 	//注释
+	char delimeter_;	//key-value之间的分隔符
+	char comment_; 	//注释
 };
 
 #endif

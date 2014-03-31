@@ -32,7 +32,7 @@ public:
     ~Server();
     
 private:
-    Conf configure_;
+    Configure configure_;
     bool status_;
     Access* proxy_;
 

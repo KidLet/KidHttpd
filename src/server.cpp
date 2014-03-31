@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "server.h"
 
-Server::Server() : configure_("./www", 8000)
+Server::Server() : configure_()
 {
     status_ = INIT;
     proxy_= NULL;
@@ -30,7 +30,7 @@ int Server::start()
 
     while(status_ != STOPED)
     {
-        sleep(1);
+        usleep(1);
     }
     
     

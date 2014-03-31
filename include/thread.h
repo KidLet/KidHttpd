@@ -18,7 +18,7 @@ class Thread
 {
 public:
     Thread();
-    ~Thread();
+    virtual ~Thread();
     
     int start();
     pthread_t id();
