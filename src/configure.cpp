@@ -17,6 +17,8 @@ void Configure::parseFile(string filename, char delimeter, char comment)
 	string line = "", key, value;
 	string::size_type pos;
 	while(ifs.eof()) {
+		cout<<"entering ifs"<<endl;
+
 		getline(ifs, line);
 		if(line.empty() || line.at(0) == comment)
 			continue;
