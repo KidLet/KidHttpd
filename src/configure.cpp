@@ -9,11 +9,11 @@
 
 #include "configure.h"
 
-void Configure::parseFile(string filename, char delimeter, char comment)
-{
+void Configure::parseFile(string filename, char delimeter, char comment) {
 	ifstream ifs(filename.c_str());
 	string line = "", key, value;
 	string::size_type pos;
+	conf_content.clear();
 
 	while(!ifs.eof()) {
 		getline(ifs, line);
@@ -48,8 +48,7 @@ void Configure::parseFile(string filename, char delimeter, char comment)
 	ifs.close();
 }
 
-string Configure::trim(string str)
-{
+string Configure::trim(string str) {
 	if(str.empty())
 		return str;
 	static const char ignore[]  = " \t\n\r\0\x0B";
@@ -69,7 +68,6 @@ void Configure::render() {
 	}
 }
 
-string Configure::getValue(string key)
-{
+string Configure::getValue(string key) {
 	return conf_content[key];
 }
