@@ -14,7 +14,7 @@
 class Lock {
 public:
 	Lock(){}
-	virtual ~Lock();
+	virtual ~Lock(){};
 
 	virtual int lock() = 0;
 	virtual bool trylock() = 0;
