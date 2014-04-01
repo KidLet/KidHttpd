@@ -12,8 +12,8 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
+#include <memory>
 #include <vector>
-
 
 static int epollFd = 0;
 
