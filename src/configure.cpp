@@ -28,19 +28,6 @@ void Configure::parseFile(string filename, char delimeter, char comment) {
 		key = trim(line.substr(0, pos));
 		value = trim(line.substr(pos+1, line.size() - pos - 1));
 
-		/*while(value == ""){
-			cout<<"enter while:"<<endl;
-			string newline = "";
-			getline(ifs, newline);
-			if(newline.empty() || newline.at(0) == comment)
-				continue;
-			newline = newline.substr(0, line.find(comment));
-			cout<<"comment:"<<newline<<endl;
-			pos = newline.find(delimeter);
-
-			value = trim(newline.substr(pos + 1, newline.size() - pos - 1));
-			cout<<"delimeter:"<<value<<endl;
-		}*/
 		if(!key.empty())
 			conf_content[key] = value;
 
