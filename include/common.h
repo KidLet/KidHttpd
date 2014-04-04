@@ -17,6 +17,7 @@
 #include <memory>
 #include <cassert>
 #include <unistd.h>
+#include <functional>
 using namespace std;
 
 

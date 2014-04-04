@@ -30,7 +30,7 @@ int Server::start()
 
     while(status_ != STOPED)
     {
-        usleep(1);
+        sleep(1);
     }
     
     

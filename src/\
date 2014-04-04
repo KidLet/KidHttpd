@@ -1,0 +1,77 @@
+/*
+ * 文件名称：access.cpp
+ * 摘要：
+ * 作者：Kidlet
+ *
+ * 历史：
+ *  2014-3-2 首次编写
+ *
+ */
+#include "access.h"
+#include "connection.h"
+#include "epoll.h"
+#include <unistd.h>
+
+#include <memory>
+#include <vector>
+
+Access::Access()
+        :listenFd_(SOCK_STREAM, AF_INET)
+{
+    poll_ = new EPoll();
+    status_ = STOP;
+}
+
+
+void Access::run()
+{
+    Access::listen();
+}
+
+int Access::listen()
+{
+    int iRet = 0;
+
+    if(listenFd_.getFd() < 0)
+        return -1;
+
+    if(status_ == START)
+        return 0;
+
+    listenFd_.setReUse();
+    iRet = listenFd_.bind("0.0.0.0", 8080);
+    assert(iRet == 0);
+    
+    listenFd_.listen(1024);
+
+    vector< Event > list;
+
+    
+    int iNumFds = 0;
+
+    poll_->add(listenFd_.getFd(), EventType::R);
+    status_ = START;
+    
+    while(status_ == START)
+    {
+        iNumFds = poll_->poll(-1, list);
+
+        for(int i=0; i<iNumFds; i++)
+        {
+            if(list[i].fd == listenFd_.getFd()) //新连接
+            {
+                shared_ptr<Socket> connSock;
+                listenFd_.accept(*connSock.get());
+                this->onConnection( connSock );
+            }
+        }
+                
+    }
+
+    return 0;
+}
+
+void Access::onConnection(shared_ptr<Socket> sock)
+{
+    Debug << "FD:" << sock->getFd() << endl;
+}

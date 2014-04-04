@@ -33,6 +33,11 @@ Socket::Socket(int iType, int iDomain)
     }
 }
 
+Socket::Socket(int fd)
+{
+    Socket::init(fd, true, AF_INET);
+}
+
 Socket::~Socket()
 {
     if(bIsOwner_ == true && iFd_ >= 0)

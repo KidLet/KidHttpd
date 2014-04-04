@@ -6,6 +6,7 @@
  * 历史:
  *	2014-3-2 首次编写
  *	2014-3-30 采用 shared_ptr 管理
+ *  2014-4-6 功能调整为一个Acceptor
  */
 #ifndef __ACCESS_H__
 #define __ACCESS_H__
@@ -13,6 +14,10 @@
 #include "common.h"
 #include "socket.h"
 #include "thread.h"
+#include "poll.h"
+#include "epoll.h"
+#include "reactor.h"
+#include <map>
 
 enum Status
 {
@@ -26,12 +31,20 @@ class Access : public Thread
 {
 public:
     Access();
-    int listen();
     void run();
 
 private:
-    Socket listenFd_;
+    int listen();
+    int eventLoop();
+    void onConnection(int fd);
+private:
+    Socket listenSock_;
     int status_;
+    int connId;
+    map<unsigned int, shared_ptr<Socket> > connMap;
+
+    Reactor* reactorsPtr;
+    int reactorNum;
 };
 
 

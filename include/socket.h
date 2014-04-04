@@ -6,6 +6,7 @@
  * 历史:
  *	2014-3-23 首次编写
  *	2014-3-30 添加reuse接口
+ *  2014-4-6  添加新的构造函数
  */
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
@@ -19,6 +20,7 @@ class Socket
 {
 public:
     Socket(int iType, int iDomain);
+    Socket(int fd);
     Socket();
     ~Socket();
     void init(int iFd, bool bIsOwner = true, int iDomain = AF_INET);

@@ -17,9 +17,9 @@ class EPoll : public Poll
 {
 public:
     EPoll();
-    ~EPoll();
+    virtual ~EPoll();
     int add(int fd, int type);
-    int del(int fd) = 0;
+    int del(int fd);
     int poll(int timeOut, vector<Event>& vecEventList);
 private:
     int epollFd;
