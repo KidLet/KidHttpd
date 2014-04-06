@@ -11,6 +11,7 @@
 #include <arpa/inet.h>  // for inet_aton
 #include <netinet/in.h> // for sockaddr_in
 #include <cstring>      // for bzero
+#include <fcntl.h>      // for fcntl
 
 Socket::Socket()
 {
@@ -114,19 +115,25 @@ int Socket::connect(const string& sIp, unsigned int iPort)
     
 }
 
-int Socket::accept(Socket& client)
+int Socket::accept(Socket& client, bool isBlock)
 {
     struct sockaddr_in stSockAddrIn;
     socklen_t iSockLen;
+    int iRet;
 
-    int iRet = ::accept(iFd_, (struct sockaddr*) &stSockAddrIn, &iSockLen);
+    if(isBlock)
+        iRet = ::accept4(iFd_, (struct sockaddr*) &stSockAddrIn, &iSockLen, 0);
+    else 
+        iRet = ::accept4(iFd_, (struct sockaddr*) &stSockAddrIn, &iSockLen, SOCK_NONBLOCK);
+
+    Debug << "Socket::accept fd:" << iFd_ << endl;
     if(iRet >= 0)
     {
         client.init(iRet, true, iDomain_);
     }
     else
     {
-        return -1;
+        return iRet;
     }
     
     return 0;
@@ -180,4 +187,33 @@ int Socket::close()
 int Socket::shutdown(int iHow)
 {
     return ::shutdown(iFd_, iHow);
+}
+
+int Socket::send(void* pvBuf, size_t iLen)
+{
+    return ::write(iFd_, pvBuf, iLen);
+}
+
+int Socket::recv(void* pvBuf, size_t iLen)
+{
+    return ::read(iFd_, pvBuf, iLen);
+}
+
+int Socket::setBlock(bool isBlock)
+{
+    int val = 0;
+    if( (val = fcntl(iFd_, F_GETFL, 0)) == -1 )
+        return -1;
+
+    if(isBlock)
+    {
+        val = val & (~O_NONBLOCK);
+    }
+    else
+    {
+        val = val | O_NONBLOCK;
+    }
+
+    return fcntl(iFd_, F_SETFL, val);
+    
 }
