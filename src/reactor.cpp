@@ -1,9 +1,11 @@
 #include "reactor.h"
-
+using namespace std::placeholders;
 Reactor::Reactor(shared_ptr<Poll> poll)
 {
     poller = poll;
     status_ = 0;
+    readCB_ = bind(&Reactor::onRead, this, _1);
+    writeCB_ = bind(&Reactor::onWrite, this, _1);
 }
 
 void Reactor::run()
@@ -28,16 +30,20 @@ int Reactor::loop(int timeOut)
     {
         if(list[i].type == EventType::RW)
         {
-            this->readCB_(list[i].fd);
-            this->writeCB_(list[i].fd);
+            if(this->writeCB_)
+                this->writeCB_(list[i].fd);
+            if(this->readCB_)
+                this->readCB_(list[i].fd);
         }
         else if(list[i].type == EventType::W)
         {
-            this->writeCB_(list[i].fd);
+            if(this->writeCB_)
+                this->writeCB_(list[i].fd);
         }
         else
         {
-            this->readCB_(list[i].fd);
+            if(this->readCB_)
+                this->readCB_(list[i].fd);
         }
         
     }
@@ -52,4 +58,17 @@ void Reactor::setOnRead( callBackFunc cb )
 void Reactor::setOnWrite( callBackFunc cb )
 {
     writeCB_ = cb;
+}
+
+void Reactor::onRead(int fd)
+{
+    if(connMap.find(fd) != connMap.end())
+    {
+        connMap[fd]->onRead();
+    }
+}
+
+void Reactor::onWrite(int fd)
+{
+    
 }

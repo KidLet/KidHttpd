@@ -17,6 +17,7 @@
 #include "poll.h"
 #include "epoll.h"
 #include "reactor.h"
+#include "connection.h"
 #include <map>
 
 enum Status
@@ -30,7 +31,7 @@ const int MAX_EVENTS = 1024;
 class Access : public Thread
 {
 public:
-    Access();
+    Access(int num);
     void run();
 
 private:
@@ -39,11 +40,9 @@ private:
     void onConnection(int fd);
 private:
     Socket listenSock_;
-    int status_;
-    int connId;
-    map<unsigned int, shared_ptr<Socket> > connMap;
+    int status;
 
-    Reactor* reactorsPtr;
+    Reactor* reactorsPtr[1024]; 
     int reactorNum;
 };
 

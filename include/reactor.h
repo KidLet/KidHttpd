@@ -8,7 +8,7 @@
  *
  * 历史:
  *	2014-3-30 首次编写
- *	2014-4-6 采用std::function做回调
+ *	2014-4-6  进一步完善
  */
 #ifndef __REACTOR_H__
 #define __REACTOR_H__
@@ -17,6 +17,8 @@
 #include "thread.h"
 #include "poll.h"
 #include "socket.h"
+#include "connection.h"
+#include <map>
 
 class Reactor : public Thread
 {
@@ -30,8 +32,12 @@ public:
     void run();
     void stop();
     shared_ptr<Poll> poller;
+    map<int, shared_ptr<Connection> > connMap;
 
 private:
+    void onRead(int fd);
+    void onWrite(int fd);
+    
     int loop(int timeOut);
     int status_;
     callBackFunc readCB_;

@@ -8,22 +8,23 @@
  *
  */
 #include "access.h"
-#include "connection.h"
 #include "epoll.h"
-#include <unistd.h>
 
 #include <memory>
 #include <vector>
 
 using namespace std::placeholders;
 
-Access::Access()
+Access::Access(int num)
         :listenSock_(SOCK_STREAM, AF_INET)
 {
-    status_ = STOP;
-    reactorsPtr = new Reactor(shared_ptr<Poll>(new EPoll()));
-    reactorNum = 1;
-    connId = 1;
+    for(int i=0; i<num; i++)
+    {
+        reactorsPtr[i] = new Reactor(shared_ptr<Poll>(new EPoll()));
+    }
+
+    status = STOP;
+    reactorNum = num;
 }
 
 
@@ -40,10 +41,11 @@ int Access::listen()
     if(listenSock_.getFd() < 0)
         return -1;
 
-    if(status_ == START)
+    if(status == START)
         return 0;
 
     listenSock_.setReUse();
+    listenSock_.setBlock(0);
     iRet = listenSock_.bind("0.0.0.0", 8080);
     assert(iRet == 0);
     
@@ -53,18 +55,31 @@ int Access::listen()
 
 int Access::eventLoop()
 {
-    reactorsPtr->poller->add(listenSock_.getFd(), EventType::R);
-    reactorsPtr->setOnRead(bind(&Access::onConnection, this, _1));
-    reactorsPtr->start();
+    reactorsPtr[0]->poller->add(listenSock_.getFd(), EventType::R);
+    reactorsPtr[0]->setOnRead(bind(&Access::onConnection, this, _1));
+    for(int i=0; i<reactorNum; i++)
+    {
+        reactorsPtr[i]->start();
+    }
+
+
     return 0;
 }
 
 void Access::onConnection(int fd)
 {
-    shared_ptr<Socket> clientSockPtr(new Socket());
-    listenSock_.accept( *clientSockPtr.get() );
-    Debug << "FD:" << clientSockPtr->getFd() << endl;
+    int clientFd;
+
+    shared_ptr<Connection> clientConnPtr(new Connection());
+    Debug << "accept:" << listenSock_.accept( *(clientConnPtr->sock.get()), 0) << endl;
+    Debug << "FD:" << clientConnPtr->sock->getFd() << endl;
+
+    clientFd = clientConnPtr->sock->getFd();
     
-    connMap[connId] = clientSockPtr;
-    connId++;
+
+    clientConnPtr->setReactor( reactorsPtr[ clientFd %(reactorNum-1)+1] );
+
+    clientConnPtr->getReactor()->connMap[clientFd] = clientConnPtr;
+    clientConnPtr->getReactor()->poller->add( clientFd, EventType::R );
+    
 }

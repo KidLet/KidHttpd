@@ -11,21 +11,27 @@
 #define __CONNECTION_H__
 
 #include "common.h"
+#include "socket.h"
 #include <string>
 
-const int MAX_HEAD_LEN = 2048;
+class Reactor;
 
 class Connection
 {
 public:
-    Socket sock;
+    Connection();
+    void setReactor(Reactor* ReactorPtr);
     
-    char* head[MAX_HEAD_LEN];
-    char* content;
-    unsigned int activeTime;
+    Reactor* getReactor();
+    
 
     ~Connection(){Debug<<"Connection out" << endl;}
+    unique_ptr<Socket> sock;
 
+private:
+    friend class Reactor;
+    Reactor* myReactorPtr;
+    void onRead();
     
 };
 
