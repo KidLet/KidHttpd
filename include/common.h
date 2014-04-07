@@ -17,6 +17,7 @@
 #include <memory>
 #include <cassert>
 #include <unistd.h>
+#include <functional>
 using namespace std;
 
 
@@ -24,6 +25,7 @@ using namespace std;
 #define NULL 0
 #endif
 
-#define Debug cout << "File:" << __FILE__ << " Line:" << __LINE__ << " Fun:" << __FUNCTION__ << " | "
+#define Debug cout << __FILE__ << " Line:" << __LINE__ << " Func:" << __FUNCTION__ << " | " 
+#define Check if(errno) {cout << "Have Error: "; perror(NULL);}
 
 #endif

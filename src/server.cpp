@@ -24,13 +24,13 @@ Server::~Server()
 
 int Server::start()
 {
-    proxy_ = new Access();
+    proxy_ = new Access(3);
 
     proxy_->start();
 
     while(status_ != STOPED)
     {
-        usleep(1);
+        sleep(1);
     }
     
     
