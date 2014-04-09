@@ -18,7 +18,5 @@ Reactor* Connection::getReactor()
 
 void Connection::onRead()
 {
-    char buf[256];
-    int len = sock->recv(buf, 256);
-    sock->send(buf, len);
+    sock->recv(readBuf, 256);
 }

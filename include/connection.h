@@ -13,6 +13,7 @@
 #include "common.h"
 #include "socket.h"
 #include <string>
+#include <vector>
 
 class Reactor;
 
@@ -21,7 +22,6 @@ class Connection
 public:
     Connection();
     void setReactor(Reactor* ReactorPtr);
-    
     Reactor* getReactor();
     
 
@@ -31,7 +31,16 @@ public:
 private:
     friend class Reactor;
     Reactor* myReactorPtr;
+    //vector<char> readBuf;
+    char readBuf[65536];
+    int readBufLen;
+    
+    char writeBuf[65536];
+    int writeBufLen;
+    //vector<char> writeBuf;
     void onRead();
+
+    
     
 };
 
