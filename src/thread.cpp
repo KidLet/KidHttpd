@@ -5,6 +5,7 @@
  *
  * 历史：
  *  2013-3-27 首次编写
+ *  2014-4-9 添加join和detach的封装
  */
 #include "thread.h"
 
@@ -33,4 +34,12 @@ void Thread::entry(Thread* self)
 pthread_t Thread::id()
 {
     return pid_;
+}
+
+int Thread::join() {
+	return pthread_join(this->pid_, NULL);
+}
+
+int Thread::detach() {
+	return pthread_detach(this->pid_);
 }

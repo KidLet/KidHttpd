@@ -9,7 +9,6 @@
 #ifndef COND_H_
 #define COND_H_
 
-#include "common.h"
 #include "mutex.h"
 #include <pthread.h>
 

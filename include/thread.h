@@ -5,6 +5,7 @@
  *
  * 历史：
  *  2014-3-27 首次编写
+ *  2014-4-9 添加join和detach的封装
  */
 
 #ifndef __THREAD_H__
@@ -21,6 +22,8 @@ public:
     
     int start();
     pthread_t id();
+    int join();
+    int detach();
 
 protected:
     static void entry(Thread* self);
