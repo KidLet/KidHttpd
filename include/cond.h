@@ -15,7 +15,7 @@
 class Cond {
 
 public:
-	Cond(const Mutex* thread_mutex);
+	Cond(const Mutex& thread_mutex);
 	virtual ~Cond();
 
 	void wait();
@@ -26,7 +26,7 @@ private:
 	timespec abstime( int millsecond);
 private:
 	pthread_cond_t cond_;
-	Mutex* cmutex_;
+	Mutex cmutex_;
 };
 
 
