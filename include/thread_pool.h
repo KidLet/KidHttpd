@@ -26,45 +26,46 @@ using namespace std;
 class ThreadPool{
 public:
 	ThreadPool();
-	ThreadPool(int min, int max, int queueSize):
-		initNum(min), minAvailNum(min), maxAvailNum(max), maxQueueSize(queueSize),running_(false) {}
+	//ThreadPool(int min, int max, int queueSize):
+	//	initNum(min), minAvailNum(min), maxAvailNum(max), maxQueueSize(queueSize),running_(false) {}
 	~ThreadPool();
 
 	void init(int num);
 	void start();
 	void stop(); //参考taf的pool的stop
 	void clear();
-	void run(); 	//启动线程池
 
 	Task* get(); 	//获取启动任务
 	Task* get(WorkerThread* thread); 	//thread工作线程获取任务
-
-	void add(Task& task);
 	void idle(WorkerThread* thread);	//将指定线程置为空闲线程
-	bool finished(); //判断任务队列中的任务是否都已经完成
-
-protected:
-	void adjust(); 	//动态调整线程池大小
+	void add(Task& task);
+	bool finished() const; //判断任务队列中的任务是否都已经完成
+	bool isFull() const;
+	//void adjust(); 	//动态调整线程池大小
 
 private:
+/*
 	int minAvailNum;
 	int maxAvailNum;
 	int liveNum;
 	int busyNum;
-	int initNum;	//线程池初始化大小
 	int queueSize; 	//当前任务队列大小
-	int maxQueueSize; // 最大任务队列大小
+
+	WorkerThread* monitor_; //监控线程池并进行动态优化
+	Mutex counter_; //线程计数器
+*/
 	bool running_; 	//thread pool的运行状态
+	int initNum;	//线程池初始化大小
+	int maxQueueSize; // 最大任务队列大小
 
 	Cond notEmpty_;//任务队列主控
 	Cond notFull_;
 	Mutex pmutex_; //thread pool的互斥锁
-	Mutex counter_; //线程计数器
 
-	deque<Task> taskQueue_;
-	vector<WorkerThread> threads_;
+	deque<Task*> queue_;
+	vector<WorkerThread*> threads_;
 
-	WorkerThread* monitor_; //监控线程池并进行动态优化
+
 };
 
 

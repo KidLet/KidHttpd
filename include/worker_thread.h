@@ -13,10 +13,9 @@
 
 class WorkerThread: public Thread {
 public:
-	WorkerThread();
 	WorkerThread(ThreadPool* pool): pool_(pool), isRun_(false) {};
-
 	virtual ~WorkerThread();
+
 	void run();
 	void terminate();
 	bool isAlive() const { return isRun_; }
