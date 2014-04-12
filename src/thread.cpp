@@ -36,10 +36,12 @@ pthread_t Thread::id()
     return pid_;
 }
 
-int Thread::join() {
-	return pthread_join(this->pid_, NULL);
+void Thread::join() {
+	int rc = pthread_join(this->pid_, NULL);
+	assert(rc == 0);
 }
 
-int Thread::detach() {
-	return pthread_detach(this->pid_);
+void Thread::detach() {
+	int rc = pthread_detach(this->pid_);
+	assert(rc == 0);
 }

@@ -22,8 +22,8 @@ public:
     
     int start();
     pthread_t id();
-    int join();
-    int detach();
+    void join();
+    void detach();
 
 protected:
     static void entry(Thread* self);
