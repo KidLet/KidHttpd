@@ -11,7 +11,7 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#define __cplusplus 201204L
+
 #include <iostream>
 #include <string>
 #include <cstdio>
