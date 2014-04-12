@@ -30,7 +30,7 @@ protected:
     virtual void run() = 0; //纯虚函数
 
     pthread_t pid_;
-    bool isRun_;
+    bool running_;
     
 };
 

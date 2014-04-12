@@ -12,7 +12,7 @@
 Thread::Thread()
 {
     pid_ = 0;
-    isRun_ = false;
+    running_ = false;
 }
 
 Thread::~Thread()
