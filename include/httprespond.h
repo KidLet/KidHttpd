@@ -15,16 +15,13 @@
 class HttpRespond : public Http
 {
 public:
-    enum Method
-    { GET, POST, UNKNOW };
 
-    Method getMethod();
-    void setMethod(Method m);
+    int stateCode;
+    void setPhrase(const string& text);
 
 private:
-    Method method_;
-    string path_;
-    string queryString_;
+    string phrase_;
+   
     
 };
 
