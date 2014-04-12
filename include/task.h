@@ -5,6 +5,7 @@
  *
  * 历史：
  *  2014年4月5日 首次编写
+ *  2014年4月10日 refactor task
  */
 #ifndef TASK_H_
 #define TASK_H_
@@ -13,13 +14,11 @@
 
 class Task {
 public:
-	Task(Thread& thread);
-	~Task();
-	void run(void*);
-	void setTaskData(void*);
+	Task(Thread* thread) : thread_(thread) {};
+	~Task() {};
+	void operator() ();
 
 private:
-	void* taskdata_;
 	Thread* thread_;
 };
 
