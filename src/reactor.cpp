@@ -1,11 +1,15 @@
 #include "reactor.h"
+#include <bits/shared_ptr.h>
 using namespace std::placeholders;
+
 Reactor::Reactor(shared_ptr<Poll> poll)
 {
     poller = poll;
     status_ = 0;
     readCB_ = bind(&Reactor::onRead, this, _1);
     writeCB_ = bind(&Reactor::onWrite, this, _1);
+
+
 }
 
 void Reactor::run()
