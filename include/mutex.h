@@ -20,9 +20,9 @@ public:
 	Mutex();
 	virtual ~Mutex();
 
-	int lock();
+	void lock();
 	bool trylock();
-	int unlock();
+	void unlock();
 
 protected:
 	friend class Cond;

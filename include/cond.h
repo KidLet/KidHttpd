@@ -15,19 +15,17 @@
 class Cond {
 
 public:
-	Cond(const Mutex& thread_mutex);
+	Cond();
 	virtual ~Cond();
 
-	void wait();
-	bool timedwait(int millsecond);
+	void wait(Mutex& mutex);
+	bool timedwait(Mutex& mutex, int millsecond);
 	void signal();
 	void broadcast();
 private:
 	timespec abstime( int millsecond);
 private:
 	pthread_cond_t cond_;
-	Mutex cmutex_;
 };
-
 
 #endif /* COND_H_ */

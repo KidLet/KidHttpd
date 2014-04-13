@@ -16,9 +16,9 @@ public:
 	Lock(){}
 	virtual ~Lock(){};
 
-	virtual int lock() = 0;
+	virtual void lock() = 0;
 	virtual bool trylock() = 0;
-	virtual int unlock() = 0;
+	virtual void unlock() = 0;
 };
 
 

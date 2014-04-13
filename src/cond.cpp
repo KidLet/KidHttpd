@@ -14,7 +14,7 @@
 
 using namespace std;
 
-Cond::Cond(const Mutex& thread_mutex):cmutex_(thread_mutex) {
+Cond::Cond() {
 	int rc;
 	pthread_condattr_t attr;
 	rc = pthread_condattr_init(&attr);
@@ -33,26 +33,29 @@ Cond::~Cond() {
 	assert(rc == 0);
 }
 
-void Cond::wait() {
-	pthread_cond_wait(&cond_, &(cmutex_.mutex_));
+void Cond::wait(Mutex& mutex) {
+	int rc = pthread_cond_wait(&cond_, &mutex.mutex_);
+	assert(rc == 0);
 }
 
-bool Cond::timedwait(int millsecond) {
+bool Cond::timedwait(Mutex& mutex, int millsecond) {
 	timespec time = abstime(millsecond);
-	int rc = pthread_cond_timedwait(&cond_, &(cmutex_.mutex_), &time);
+	int rc = pthread_cond_timedwait(&cond_, &mutex.mutex_, &time);
 	/*if(rc == ETIMEDOUT)
 		cout<<"time pout"<<endl;*/
-
+	assert(rc == 0);
 
 	return (rc == 0);
 }
 
 void Cond::signal() {
-	pthread_cond_signal(&cond_);
+	int rc = pthread_cond_signal(&cond_);
+	assert(rc == 0);
 }
 
 void Cond::broadcast() {
-	pthread_cond_broadcast(&cond_);
+	int rc = pthread_cond_broadcast(&cond_);
+	assert(rc == 0);
 }
 
 timespec Cond::abstime(int millsecond) {

@@ -39,8 +39,9 @@ Mutex::~Mutex() {
 	assert(rc == 0);
 }
 
-int Mutex::lock() {
-	return pthread_mutex_lock(&mutex_);
+void Mutex::lock() {
+	int rc = pthread_mutex_lock(&mutex_);
+	assert(rc == 0);
 }
 
 bool Mutex::trylock() {
@@ -52,7 +53,8 @@ bool Mutex::trylock() {
 	return (rc == 0);
 }
 
-int Mutex::unlock() {
-	return pthread_mutex_unlock(&mutex_);
+void Mutex::unlock() {
+	int rc = pthread_mutex_unlock(&mutex_);
+	assert(rc == 0);
 }
 
