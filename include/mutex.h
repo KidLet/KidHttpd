@@ -9,12 +9,11 @@
 #ifndef MUTEX_H_
 #define MUTEX_H_
 
-#include "lock.h"
 #include <pthread.h>
 
 class Cond;
 
-class Mutex : public Lock{
+class Mutex {
 
 public:
 	Mutex();
