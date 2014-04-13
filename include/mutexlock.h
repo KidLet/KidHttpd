@@ -20,7 +20,7 @@ public:
 		mutex_.unlock();
 	}
 private:
-	Mutex& mutex_;
+	Mutex mutex_;
 };
 
 
