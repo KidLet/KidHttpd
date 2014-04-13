@@ -10,15 +10,24 @@
 #ifndef TASK_H_
 #define TASK_H_
 
-#include "thread.h"
+#include "common.h"
+
+using namespace std::placeholders;
+
+class Thread;
+class ThreadWorker;
+class ThreadMonitor;
 
 class Task {
 public:
 	Task(Thread* thread) : thread_(thread) {};
 	~Task() {};
 	void operator() ();
+protected:
+	friend class Thread;
+	friend class ThreadWorker;
+	friend class ThreadMonitor;
 
-private:
 	Thread* thread_;
 };
 
