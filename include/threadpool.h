@@ -12,8 +12,6 @@
 
 
 #include "task.h"
-#include "cond.h"
-#include "mutex.h"
 #include "queue.h"
 #include "threadworker.h"
 #include "threadlock.h"
@@ -25,7 +23,7 @@
 
 using namespace std;
 
-class ThreadPool{
+class ThreadPool : public ThreadLock {
 public:
 	ThreadPool();
 	~ThreadPool();
@@ -44,7 +42,6 @@ public:
 	void notifyAll();
 
 	void adjust(); 	//动态调整线程池大小
-
 private:
 	size_t tNum;	//线程池初始化大小
 	size_t minAvailNum;
@@ -54,17 +51,15 @@ private:
 
 	bool running_; 	//thread pool的运行状态
 
-	ThreadLock<Mutex, Cond> pmutex_; //thread pool的互斥锁
-	//ThreadLock<Mutex, Cond> counter_; //线程计数器
+	ThreadLock pmutex_; //thread pool的互斥锁
+	//MutexLock counter_; //线程计数器
+	ThreadMonitor* monitor_; //监控线程池并进行动态优化
 
 	Queue<Task*> jobQueue;
 	Queue<Task*> startQueue;
 
 	vector<ThreadWorker*> jobThread;
 	set<ThreadWorker*> busyThread;
-
-	ThreadMonitor* monitor_; //监控线程池并进行动态优化
-
 };
 
 #endif /* THREADPOOL_H_ */

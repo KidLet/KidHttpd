@@ -5,6 +5,7 @@
  *
  * 历史：
  *  2014年4月12日 首次编写
+ *  2014年4月13日 完善内部实现，对线程池加锁
  */
 #include "threadpool.h"
 
@@ -15,7 +16,7 @@ ThreadPool::ThreadPool() {
 	maxAvailNum = 0;
 	liveNum = 0;
 	busyNum = 0;
-	//monitor_ = NULL;
+	monitor_ = new ThreadMonitor(this);
 }
 
 ThreadPool::~ThreadPool() {
@@ -27,6 +28,7 @@ ThreadPool::~ThreadPool() {
 
 void ThreadPool::init(int min, int max) {
 	stop();
+	Lock lock(*this);
 	clear();
 	tNum = min;
 	minAvailNum = min;
@@ -37,9 +39,10 @@ void ThreadPool::init(int min, int max) {
 }
 
 void ThreadPool::start() {
+	Lock lock(*this);
 	vector<ThreadWorker*>::iterator it = jobThread.begin();
 	while(it != jobThread.end()) {
-		//(*it) -> start();
+		(*it)->start();
 		it++;
 	}
 	monitor_->start();
@@ -47,10 +50,11 @@ void ThreadPool::start() {
 }
 
 void ThreadPool::stop() {
+	Lock lock(*this);
 	vector<ThreadWorker*>::iterator it = jobThread.begin();
 	while(it != jobThread.end()) {
-		//if((*it)->isAlive())
-			//(*it)->terminate();
+		if((*it)->isAlive())
+			(*it)->terminate();
 		it++;
 	}
 	running_ = false;
@@ -77,11 +81,13 @@ Task* ThreadPool::get(ThreadWorker* thread) {
 	Task* task = NULL;
 	if(!jobQueue.pop_front(task, 1000))
 		return NULL;
+	Lock lock(pmutex_);
 	busyThread.insert(thread);
 	return task;
 }
 
 void ThreadPool::idle(ThreadWorker* thread) {
+	Lock lock(pmutex_);
 	busyThread.erase(thread);
 	if(busyThread.empty())
 		pmutex_.notifyAll();
