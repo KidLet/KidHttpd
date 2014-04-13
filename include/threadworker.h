@@ -27,6 +27,4 @@ protected:
 	ThreadPool* pool_;
 };
 
-
-
 #endif /* THREADWORKER_H_ */
