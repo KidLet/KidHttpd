@@ -10,7 +10,6 @@
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
-
 #include "task.h"
 #include "queue.h"
 #include "threadworker.h"
