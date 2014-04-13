@@ -11,15 +11,13 @@
 
 #include "common.h"
 
-class Lock {
+template <class T>
+class LockT {
 public:
-	Lock(){}
-	virtual ~Lock(){};
-
-	virtual void lock() = 0;
-	virtual bool trylock() = 0;
-	virtual void unlock() = 0;
+	LockT(const T& mutex) : mutex_(mutex) { mutex_.lock(); }
+	~LockT() { mutex_.unlock(); }
+private:
+	T mutex_;
 };
-
 
 #endif /* LOCK_H_ */
