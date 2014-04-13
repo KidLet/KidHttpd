@@ -1,10 +1,11 @@
 /*
  * 文件名称：queue.h
  * 摘要：
- * 作者：KidLet
+ * 作者：Zoey
  *
  * 历史：
- *  2014-3-2 首次编写
+ *  2014-4-5 首次编写
+ *  2014-4-13 添加MutexLock控制线程安全
  */
 
 #ifndef __QUEUE_H__
@@ -13,6 +14,8 @@
 #include "common.h"
 #include "mutex.h"
 #include "cond.h"
+#include "mutexlock.h"
+
 #include <deque>
 using namespace std;
 
@@ -45,6 +48,7 @@ private:
 
 template<typename T, typename D>
 bool Queue<T, D>::pop_front(T& t, int millsecond) {
+	MutexLock lock(mutex_);
 	if(queue_.empty()) {
 		if(millsecond == 0)
 			return false;
@@ -68,6 +72,7 @@ bool Queue<T, D>::pop_front(T& t, int millsecond) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_back(T& t) {
+	MutexLock lock(mutex_);
 	queue_.push_back(t);
 	size_++;
 	cond_.signal();
@@ -75,6 +80,7 @@ void Queue<T, D>::push_back(T& t) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_back(queue_type& qt) {
+	MutexLock lock(mutex_);
 	typename queue_type::const_iterator it;
 	for(it = qt.begin(); it != qt.end(); it++) {
 		queue_.push_back(*it);
@@ -85,6 +91,7 @@ void Queue<T, D>::push_back(queue_type& qt) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_front(T& t) {
+	MutexLock lock(mutex_);
 	queue_.push_front(t);
 	size_++;
 	cond_.signal();
@@ -92,6 +99,7 @@ void Queue<T, D>::push_front(T& t) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_front(queue_type& qt) {
+	MutexLock lock(mutex_);
 	typename queue_type::const_iterator it;
 	for(it = qt.begin(); it != qt.end(); it++) {
 		queue_.push_front(*it);
@@ -107,17 +115,20 @@ void Queue<T, D>::notifyT() {
 
 template<typename T, typename D>
 size_t Queue<T, D>::size() const {
+	MutexLock lock(mutex_);
 	return size_;
 }
 
 template<typename T, typename D>
 void Queue<T, D>::clear() {
+	MutexLock lock(mutex_);
 	queue_.clear();
 	size_ = 0;
 }
 
 template<typename T, typename D>
 bool Queue<T, D>::empty() const {
+	MutexLock lock(mutex_);
 	return queue_.empty();
 }
 #endif
