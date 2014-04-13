@@ -10,18 +10,20 @@
 #define THREADWORKER_H_
 
 #include "thread.h"
-#include "thread_pool.h"
+#include "task.h"
+
+class ThreadPool;
 
 class ThreadWorker: public Thread {
 public:
-	ThreadWorker(ThreadPool* pool): pool_(pool), running_(false) {};
-	virtual ~ThreadWorker();
+	ThreadWorker(ThreadPool* pool);
+	~ThreadWorker();
 
 	void run();
 	void terminate();
 	bool isAlive() const { return running_; }
 
-private:
+protected:
 	ThreadPool* pool_;
 };
 
