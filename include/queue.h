@@ -5,23 +5,20 @@
  *
  * 历史：
  *  2014-4-5 首次编写
- *  2014-4-13 添加MutexLock控制线程安全
+ *  2014-4-13 通过继承ThreadLock对Mutex和Cond进行进一步封装
  */
 
 #ifndef __QUEUE_H__
 #define __QUEUE_H__
 
-#include "common.h"
-#include "mutex.h"
-#include "cond.h"
-#include "mutexlock.h"
+#include "threadlock.h"
 
 #include <deque>
 using namespace std;
 
 
 template<typename T, typename D = deque<T>>
-class Queue {
+class Queue :public ThreadLock {
 	typedef D queue_type;
 public:
     Queue() : size_(0){};
@@ -41,26 +38,26 @@ public:
 private:
     queue_type queue_;
     size_t size_;
-    Mutex mutex_;
-    Cond cond_;
 };
-
 
 template<typename T, typename D>
 bool Queue<T, D>::pop_front(T& t, int millsecond) {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	if(queue_.empty()) {
-		if(millsecond == 0)
+		if(millsecond == 0) {
 			return false;
+		}
 		if(millsecond == -1)
-			cond_.wait(mutex_);
+			wait();
 		else {
-			if(!cond_.timedwait(mutex_, millsecond))
+			if(!timedwait(millsecond)) {
 				return false;
+			}
 		}
 	}
-	if(queue_.empty())
+	if(queue_.empty()) {
 		return false;
+	}
 
 	t = queue_.front();
 	queue_.pop_front();
@@ -72,7 +69,7 @@ bool Queue<T, D>::pop_front(T& t, int millsecond) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_back(T& t) {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	queue_.push_back(t);
 	size_++;
 	cond_.signal();
@@ -80,7 +77,7 @@ void Queue<T, D>::push_back(T& t) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_back(queue_type& qt) {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	typename queue_type::const_iterator it;
 	for(it = qt.begin(); it != qt.end(); it++) {
 		queue_.push_back(*it);
@@ -91,7 +88,7 @@ void Queue<T, D>::push_back(queue_type& qt) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_front(T& t) {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	queue_.push_front(t);
 	size_++;
 	cond_.signal();
@@ -99,7 +96,7 @@ void Queue<T, D>::push_front(T& t) {
 
 template<typename T, typename D>
 void Queue<T, D>::push_front(queue_type& qt) {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	typename queue_type::const_iterator it;
 	for(it = qt.begin(); it != qt.end(); it++) {
 		queue_.push_front(*it);
@@ -115,20 +112,20 @@ void Queue<T, D>::notifyT() {
 
 template<typename T, typename D>
 size_t Queue<T, D>::size() const {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	return size_;
 }
 
 template<typename T, typename D>
 void Queue<T, D>::clear() {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	queue_.clear();
 	size_ = 0;
 }
 
 template<typename T, typename D>
 bool Queue<T, D>::empty() const {
-	MutexLock lock(mutex_);
+	Lock lock(*this);
 	return queue_.empty();
 }
 #endif
