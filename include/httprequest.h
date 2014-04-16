@@ -20,11 +20,12 @@ public:
 
     Method getMethod();
     void setMethod(Method m); 
+    int parse(char* ptr, size_t len);
+    string getURI();
 
 private:
     Method method_;
-    string path_;
-    string queryString_;
+    string uri_;
     
 };
 

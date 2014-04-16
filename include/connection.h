@@ -12,6 +12,7 @@
 
 #include "common.h"
 #include "socket.h"
+#include "httprequest.h"
 #include <string>
 #include <vector>
 
@@ -23,7 +24,11 @@ public:
     Connection();
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
+
+    HttpRequest request;
+    HttpRespond respond;
     
+
 
     ~Connection(){Debug<<"Connection out" << endl;}
     unique_ptr<Socket> sock;
@@ -31,14 +36,37 @@ public:
 private:
     friend class Reactor;
     Reactor* myReactorPtr;
-    //vector<char> readBuf;
+
+
     char readBuf[65536];
     int readBufLen;
     
     char writeBuf[65536];
     int writeBufLen;
-    //vector<char> writeBuf;
+
     void onRead();
+    void onClose();
+    
+    void handleLogic(int len);
+    void handleGetHeader(int len);
+    void handleGetContent(int len);
+    void handleRespond();
+
+    enum State
+    {
+        close,
+        connect,
+        reqHeader, //header载入完毕
+        reqContent,//content载入完毕
+        reqHandle,
+        resWrite,
+        error
+    };
+
+    State state_;
+    size_t headerEndPos;
+    size_t contentEndPos;
+
 
     
     
