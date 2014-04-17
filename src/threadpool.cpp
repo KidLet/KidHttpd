@@ -5,7 +5,8 @@
  *
  * 历史：
  *  2014年4月12日 首次编写
- *  2014年4月13日 完善内部实现，对线程池加锁
+ *  2014年4月12日 完善内部实现，对线程池加锁
+ *  2014年4月13日 完成线程池动态优化的实现
  */
 #include "threadpool.h"
 
@@ -33,6 +34,8 @@ void ThreadPool::init(int min, int max) {
 	tNum = min;
 	minAvailNum = min;
 	maxAvailNum = max;
+	busyNum = 0;
+	liveNum = min;
 
 	for(size_t i = 0; i < tNum; i++)
 		jobThread.push_back(new ThreadWorker(this));
@@ -94,7 +97,8 @@ void ThreadPool::idle(ThreadWorker* thread) {
 }
 
 void ThreadPool::add(Task* task) {
-	jobQueue.push_back(task);
+	if(running_)
+		jobQueue.push_back(task);
 }
 
 void ThreadPool::clearQueue() {
