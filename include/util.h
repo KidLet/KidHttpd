@@ -12,7 +12,17 @@
 
 #include "common.h"
 #include <vector>
+#include <sstream>
 
 int Split(const char* str, const char* delimeter, vector<string>& vec);
 
+template<class T>
+string tostr(const T& t)
+{
+    stringstream ss;
+    string str;
+    ss << t;
+    ss >> str;
+    return str;
+}
 #endif

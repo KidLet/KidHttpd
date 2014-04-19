@@ -34,6 +34,7 @@ int Reactor::loop(int timeOut)
     {
         if(list[i].type == EventType::RW)
         {
+            Debug << "ReadWrite Event fd:" << list[i].fd << endl;
             if(this->writeCB_)
                 this->writeCB_(list[i].fd);
             if(this->readCB_)
@@ -41,13 +42,18 @@ int Reactor::loop(int timeOut)
         }
         else if(list[i].type == EventType::W)
         {
+            Debug << "Write Event fd:" << list[i].fd << endl;
             if(this->writeCB_)
                 this->writeCB_(list[i].fd);
         }
         else
         {
+            Debug << "read Event fd:" << list[i].fd << endl;
             if(this->readCB_)
+            {
+                Debug << "excute read Event fd:" << list[i].fd << endl;
                 this->readCB_(list[i].fd);
+            }
         }
         
     }
@@ -74,5 +80,9 @@ void Reactor::onRead(int fd)
 
 void Reactor::onWrite(int fd)
 {
+    if(connMap.find(fd) != connMap.end())
+    {
+        connMap[fd]->onWrite();
+    }
     
 }

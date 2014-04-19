@@ -29,8 +29,9 @@ public:
     vector<char> content;
     string getHeader(const string& key);
     int setHeader(const string& key, const string& value);
+    
 
-private:
+protected:
     map<string, string> mapHeader;
 };
 

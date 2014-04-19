@@ -25,6 +25,25 @@ int EPoll::add(int fd, int type)
     return 0;
 }
 
+int EPoll::ctl(int fd, int type)
+{
+    struct epoll_event ev;
+    int iRet;
+    if(type == EventType::RW)
+        ev.events = EPOLLIN | EPOLLOUT;
+    else if(type == EventType::W)
+        ev.events = EPOLLOUT;
+    else
+        ev.events = EPOLLIN;
+
+    ev.data.fd = fd;
+        
+    iRet = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ev);
+    assert(iRet != -1);
+    return 0;
+}
+
+
 int EPoll::del(int fd)
 {
     int iRet = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
@@ -41,6 +60,7 @@ int EPoll::poll(int timeOut, vector<Event>& vecEventList)
     
     num = epoll_wait(epollFd, events, MAX, timeOut);
     assert(num != -1);
+    Debug << endl;
     vecEventList.clear();
 
     for(int i=0; i<num; i++)

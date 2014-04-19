@@ -13,6 +13,7 @@
 #include "common.h"
 #include "socket.h"
 #include "httprequest.h"
+#include "httprespond.h"
 #include <string>
 #include <vector>
 
@@ -22,6 +23,8 @@ class Connection
 {
 public:
     Connection();
+    ~Connection(){Debug<<"Connection out" << endl;}
+    
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
 
@@ -30,7 +33,6 @@ public:
     
 
 
-    ~Connection(){Debug<<"Connection out" << endl;}
     unique_ptr<Socket> sock;
 
 private:
@@ -43,14 +45,18 @@ private:
     
     char writeBuf[65536];
     int writeBufLen;
+    int hasWriteLen;
+    ssize_t hasFileLen;
 
     void onRead();
+    void onWrite();
     void onClose();
     
     void handleLogic(int len);
     void handleGetHeader(int len);
     void handleGetContent(int len);
     void handleRespond();
+    void handleWrite();
 
     enum State
     {

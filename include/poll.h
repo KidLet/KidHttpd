@@ -32,6 +32,7 @@ class Poll
 public:
     virtual int add(int fd, int type) = 0;
     virtual int del(int fd) = 0;
+    virtual int ctl(int fd, int type) = 0;
     virtual int poll(int timeOut, vector<Event>& vecEventList) = 0;
     
 };

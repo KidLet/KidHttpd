@@ -24,7 +24,7 @@ Server::~Server()
 
 int Server::start()
 {
-    proxy_ = new Access(3);
+    proxy_ = new Access(2);
 
     proxy_->start();
 

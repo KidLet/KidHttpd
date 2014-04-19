@@ -3,6 +3,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sendfile.h>
 #include <fcntl.h>
 
 Connection::Connection() :
@@ -10,7 +11,11 @@ Connection::Connection() :
 {
     readBufLen = 0;
     writeBufLen = 0;
+    hasWriteLen = 0;
+    hasFileLen = 0;
+    
     state_ = close;
+
     
 }
 
@@ -37,16 +42,66 @@ void Connection::onRead()
     }
 
     handleLogic(len);
+    Debug << endl;
+}
+
+void Connection::onWrite()
+{
+    if(hasWriteLen < writeBufLen)
+    {
+        Debug << "Write Header!" << endl;
+        int iRet = sock->send(writeBuf + hasWriteLen, writeBufLen - hasWriteLen);
+        if(iRet >= 0)
+        {
+            hasWriteLen += iRet;
+        }
+    }
+    else
+    {
+        Debug << endl << string(writeBuf, hasFileLen) << endl;
+        HttpRespond::fileInfo info;
+
+        int iRet = respond.isGetFile(&info);
+        if(iRet == 0)
+        {
+            iRet = sendfile(sock->getFd(), info.fd, NULL, info.fileSize);
+            if(iRet >= 0)
+            {
+                sock->send("\r\n\r\n", 4);
+                onClose();
+            }
+            else
+            {
+               
+            }
+        }
+        else
+        {
+            onClose();
+        }
+        
+        
+    }
+
 }
 
 void Connection::onClose()
 {
     myReactorPtr->poller->del(sock->getFd());
     myReactorPtr->connMap.erase(sock->getFd());
+
+    //HttpRespond::fileInfo info;
+    respond.isGetFile(NULL);
+
+    /*if(iRet == 0)
+    {
+        ::close(info.fd);
+        }*/
+    Debug << endl;
     
 }
 
-void Connection::handleLogic(int len)
+void Connection::handleLogic(int len = 0)
 {
     switch(state_)
     {
@@ -56,43 +111,43 @@ void Connection::handleLogic(int len)
         case reqHeader:
             handleRespond();
             break;
+        case resWrite:
+            handleWrite();
+            break;
         case error:
             Debug << "Http Error" << endl;
+            return ;
+        case close:
+            return ;
         default:
             break;
-            
     }
-        
 }
 
 void Connection::handleGetHeader(int len)
 {
-    static char* ptrLast;
-    if( len == readBufLen )
-        ptrLast = readBuf;
     
-    string tmp (ptrLast, (int)((readBuf + readBufLen) - ptrLast) );
+    string tmp (readBuf, readBufLen);
     string::size_type pos = string::npos;
 
     if( (pos = tmp.find("\r\n\r\n")) != string::npos )
     {
-        Debug << "found header:" << endl << string(readBuf, pos + int(ptrLast - readBuf)) << endl;
-        headerEndPos = pos + (ptrLast - readBuf) + 2;
+        Debug << "found header:" << endl << string(readBuf, pos) << endl;
+        headerEndPos = pos;
 
         if(request.parse(readBuf, headerEndPos) == 0)
         {
             state_ = reqHeader;
-            handleLogic(0);
         }
         else
         {
             state_ = error;
         }
+        handleLogic();
     }
     else
     {
         Debug << "no found header end flag" << endl;;
-        ptrLast = readBuf + readBufLen - 3;
     }
     
 }
@@ -114,16 +169,33 @@ void Connection::handleRespond()
 {
     if(request.getMethod() == HttpRequest::GET)
     {
-        string filePath = "/home/kidlet/Work/KidHttpd/www/" + request.getURI();
-        int fd = open(filePath.c_str(), O_RDONLY);
-
-        if(fd < 0)
+        if(respond.resFile("/home/kidlet/Work/KidHttpd/www/" + request.getURI()) != 0)
         {
-            respond.stateCode = 404;
-            respond.setPhrase("not found"); 
+            respond.notFound();
         }
-        
+        respond.encode(writeBuf, writeBufLen);
+        Debug << endl <<string(writeBuf, writeBufLen) << endl;
+        state_ = resWrite;
+    }
+    else
+    {
+        respond.stateCode = 502;
+        respond.setPhrase("Not Implement");
+        respond.version = Http::Version::Http11;
+        respond.setHeader("connection:", "close");
+        respond.setHeader("Content-Type", "text/html");
+        respond.content.clear();
+
+        respond.encode(writeBuf, writeBufLen);
+        state_ = resWrite;
         
     }
+    handleLogic();
     
+}
+
+void Connection::handleWrite()
+{
+    myReactorPtr->poller->ctl(sock->getFd(), EventType::RW);
+   
 }

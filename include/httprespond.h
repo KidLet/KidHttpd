@@ -15,12 +15,30 @@
 class HttpRespond : public Http
 {
 public:
+    struct fileInfo
+    {
+        int fd;
+        unsigned long fileSize;
+    };
+
+    HttpRespond();
 
     int stateCode;
     void setPhrase(const string& text);
 
+    void encode(char* ptr, int& len);
+    string getContentType(const string& ext);
+
+    void notFound();
+    int resFile(const string& path);
+    int isGetFile(fileInfo* info);
+
+
 private:
     string phrase_;
+    static map<string, string> mapContentType;
+    static void addType();
+    struct fileInfo info_;
    
     
 };
