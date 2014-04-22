@@ -27,6 +27,7 @@ public:
     
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
+    int getStatus(){return state_;}
 
     HttpRequest request;
     HttpRespond respond;

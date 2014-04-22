@@ -13,7 +13,7 @@
 #
 
 CC          	=  gcc
-CXX         	=  g++
+CXX         	=  g++-4.8
 CFLAGS      	+= -g -fPIC -Wno-deprecated -Wall -Werror -std=gnu++0x
 
 SRC 			=  $(wildcard ./src/*.cpp)

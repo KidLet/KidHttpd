@@ -1,5 +1,8 @@
 #include "connection.h"
 #include "reactor.h"
+#include "server.h"
+#include "util.h"
+
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -34,6 +37,7 @@ void Connection::onRead()
 {
     int len = sock->recv(readBuf + readBufLen, 256);
     readBufLen += len;
+    Debug << "Read Len: " << len << endl;
 
     if(len == 0)
     {
@@ -42,7 +46,6 @@ void Connection::onRead()
     }
 
     handleLogic(len);
-    Debug << endl;
 }
 
 void Connection::onWrite()
@@ -87,16 +90,21 @@ void Connection::onWrite()
 
 void Connection::onClose()
 {
+    //myReactorPtr->connMap.erase(sock->getFd());
+    if(state_ == close)
+    {
+        return ;
+    }
+    state_ = close;
     myReactorPtr->poller->del(sock->getFd());
-    myReactorPtr->connMap.erase(sock->getFd());
 
-    //HttpRespond::fileInfo info;
-    respond.isGetFile(NULL);
+    HttpRespond::fileInfo info;
+    int iRet = respond.isGetFile(&info);
 
-    /*if(iRet == 0)
+    if(iRet == 0)
     {
         ::close(info.fd);
-        }*/
+    }
     Debug << endl;
     
 }
@@ -132,7 +140,7 @@ void Connection::handleGetHeader(int len)
 
     if( (pos = tmp.find("\r\n\r\n")) != string::npos )
     {
-        Debug << "found header:" << endl << string(readBuf, pos) << endl;
+        //Debug << "found header:" << endl << string(readBuf, pos) << endl;
         headerEndPos = pos;
 
         if(request.parse(readBuf, headerEndPos) == 0)
@@ -169,9 +177,23 @@ void Connection::handleRespond()
 {
     if(request.getMethod() == HttpRequest::GET)
     {
-        if(respond.resFile("/home/kidlet/Work/KidHttpd/www/" + request.getURI()) != 0)
+        
+        if(respond.resFile(Server::getInstance()->getConf()->getValue("path") + request.getURI()) != 0)
         {
-            respond.notFound();
+            vector<string> vecFile;
+            Split(Server::getInstance()->getConf()->getValue("default_files").c_str(), ",", vecFile);
+
+            auto it = vecFile.begin();
+
+            for(; it!=vecFile.end(); it++)
+            {
+                if(respond.resFile(Server::getInstance()->getConf()->getValue("path") +
+                                   request.getURI() + "/" + *it ) == 0)
+                    break;
+
+            }
+            if(it == vecFile.end())
+                respond.notFound();
         }
         respond.encode(writeBuf, writeBufLen);
         Debug << endl <<string(writeBuf, writeBufLen) << endl;
@@ -179,12 +201,7 @@ void Connection::handleRespond()
     }
     else
     {
-        respond.stateCode = 502;
-        respond.setPhrase("Not Implement");
-        respond.version = Http::Version::Http11;
-        respond.setHeader("connection:", "close");
-        respond.setHeader("Content-Type", "text/html");
-        respond.content.clear();
+        respond.notImplement();
 
         respond.encode(writeBuf, writeBufLen);
         state_ = resWrite;

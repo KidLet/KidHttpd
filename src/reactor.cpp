@@ -55,6 +55,13 @@ int Reactor::loop(int timeOut)
                 this->readCB_(list[i].fd);
             }
         }
+
+        if(connMap.find(list[i].fd) != connMap.end() && connMap[list[i].fd]->getStatus() == Connection::State::close )
+        {
+            connMap.erase(list[i].fd);
+
+        }
+        Debug << "Cur have " << connMap.size() << " Connections" << endl;
         
     }
     return 0;
@@ -76,6 +83,10 @@ void Reactor::onRead(int fd)
     {
         connMap[fd]->onRead();
     }
+    else
+    {
+        poller->del(fd);
+    }
 }
 
 void Reactor::onWrite(int fd)
@@ -83,6 +94,10 @@ void Reactor::onWrite(int fd)
     if(connMap.find(fd) != connMap.end())
     {
         connMap[fd]->onWrite();
+    }
+    else
+    {
+        poller->del(fd);
     }
     
 }

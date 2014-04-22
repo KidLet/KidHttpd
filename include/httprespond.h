@@ -30,6 +30,9 @@ public:
     string getContentType(const string& ext);
 
     void notFound();
+    void notImplement();
+    void serverError();
+
     int resFile(const string& path);
     int isGetFile(fileInfo* info);
 

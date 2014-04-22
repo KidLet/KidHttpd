@@ -28,7 +28,7 @@ void HttpRespond::notFound()
     version = Http11;
     stateCode = 404;
     setPhrase("not found");
-    setHeader("connection:", "close");
+    setHeader("connection", "close");
     setHeader("Content-Type", "text/html");
 
     string text = "<html><body>not found</body></html>";
@@ -40,6 +40,39 @@ void HttpRespond::notFound()
 
 }
 
+void HttpRespond::notImplement()
+{
+    version = Http11;
+    stateCode = 501;
+    setPhrase("not Implement");
+    setHeader("connection", "close");
+    setHeader("Content-Type", "text/html");
+
+    string text = "<html><body>not Implement</body></html>";
+    content.clear();
+    content.assign(text.begin(), text.end());
+    setHeader("Content-Length", tostr<size_t>(content.size()) );
+
+    info_.fd = -1;
+    
+}
+
+void HttpRespond::serverError()
+{
+    version = Http11;
+    stateCode = 500;
+    setPhrase("Server Error");
+    setHeader("connection", "close");
+    setHeader("Content-Type", "text/html");
+
+    string text = "<html><body>Server Error</body></html>";
+    content.clear();
+    content.assign(text.begin(), text.end());
+    setHeader("Content-Length", tostr<size_t>(content.size()) );
+
+    info_.fd = -1;
+    
+}
 
 void HttpRespond::encode(char* ptr, int& len)
 {
@@ -104,13 +137,20 @@ int HttpRespond::resFile(const string& path)
 
     unsigned long fileSize = -1;
     struct stat statBuf;
-    if(stat(path.c_str(), &statBuf) < 0)
+    if(fstat(fd, &statBuf) < 0)
     {
+        ::close(fd);
         return -1;
     }
 
-    fileSize = statBuf.st_size;
+    //不是普通文件
+    if(! S_ISREG(statBuf.st_mode) )
+    {
+        ::close(fd);
+        return -2;
+    }
 
+    fileSize = statBuf.st_size;
     info_.fd = fd;
     info_.fileSize = fileSize;
     
@@ -119,7 +159,7 @@ int HttpRespond::resFile(const string& path)
     version = Http11;
     stateCode = 200;
     setPhrase("ok");
-    setHeader("connection:", "close");
+    setHeader("connection", "close");
 
     vector<string> vecFile;
     

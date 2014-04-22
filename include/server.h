@@ -9,6 +9,7 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
+#include "common.h"
 #include "singleton.h"
 #include "configure.h"
 #include "access.h"
@@ -26,6 +27,8 @@ class Server : public Singleton<Server>
 public:
     int start();
     int stop();
+
+    Configure* getConf(){return &configure_;}
 
     Server();
     ~Server();

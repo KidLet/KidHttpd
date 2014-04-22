@@ -7,13 +7,14 @@
  *  2014-3-2 首次编写
  *
  */
-#include <unistd.h>
 #include "server.h"
 
 Server::Server() : configure_()
 {
     status_ = INIT;
     proxy_= NULL;
+
+    configure_.parseFile("conf/http.conf");
 }
 
 Server::~Server()
