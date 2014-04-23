@@ -60,7 +60,7 @@ int EPoll::poll(int timeOut, vector<Event>& vecEventList)
     
     num = epoll_wait(epollFd, events, MAX, timeOut);
     assert(num != -1);
-    Debug << endl;
+
     vecEventList.clear();
 
     for(int i=0; i<num; i++)

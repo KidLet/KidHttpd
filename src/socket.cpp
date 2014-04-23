@@ -44,9 +44,9 @@ Socket::~Socket()
     if(bIsOwner_ == true && iFd_ >= 0)
     {
         ::close(iFd_);
-        Debug << "Socket: " << iFd_ << " Delete" << endl;
         iFd_ = -1;
     }
+    Debug << "Socket: " << iFd_ << " Delete" << endl;
 }
 
 int Socket::setReUse(bool bIsReUse)

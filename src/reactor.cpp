@@ -1,4 +1,5 @@
 #include "reactor.h"
+#include "server.h"
 #include <bits/shared_ptr.h>
 using namespace std::placeholders;
 
@@ -32,6 +33,19 @@ int Reactor::loop(int timeOut)
 
     for(int i=0; i<iNumFds; i++)
     {
+
+        Server::getInstance()->gLock.lock();
+        if(connMap.find(list[i].fd) != connMap.end() && connMap[list[i].fd]->getStatus() == Connection::State::close )
+        {
+            Debug << "Erase connMap fd:" << list[i].fd << endl;
+            poller->del(list[i].fd);
+            connMap.erase(list[i].fd);
+            Server::getInstance()->gLock.unlock();
+            continue;
+
+        }
+        Server::getInstance()->gLock.unlock();
+
         if(list[i].type == EventType::RW)
         {
             Debug << "ReadWrite Event fd:" << list[i].fd << endl;
@@ -56,14 +70,13 @@ int Reactor::loop(int timeOut)
             }
         }
 
-        if(connMap.find(list[i].fd) != connMap.end() && connMap[list[i].fd]->getStatus() == Connection::State::close )
-        {
-            connMap.erase(list[i].fd);
-
-        }
-        Debug << "Cur have " << connMap.size() << " Connections" << endl;
         
     }
+
+
+    Debug << "Cur have " << connMap.size() << " Connections" << endl;
+
+
     return 0;
 }
 
@@ -85,6 +98,7 @@ void Reactor::onRead(int fd)
     }
     else
     {
+        Debug << "onRead Not Found FD:" << fd << endl;
         poller->del(fd);
     }
 }
@@ -97,6 +111,7 @@ void Reactor::onWrite(int fd)
     }
     else
     {
+        Debug << "onWrite Not Found FD:" << fd << endl;
         poller->del(fd);
     }
     

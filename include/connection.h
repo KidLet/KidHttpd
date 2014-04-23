@@ -23,7 +23,7 @@ class Connection
 {
 public:
     Connection();
-    ~Connection(){Debug<<"Connection out" << endl;}
+    ~Connection(){Debug<<"Connection out , FD:" << sock->getFd() << endl;}
     
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
@@ -46,6 +46,8 @@ private:
     int writeBufLen;
     int hasWriteLen;
     ssize_t hasFileLen;
+
+    int hasTailLen;
 
     void onRead();
     void onWrite();

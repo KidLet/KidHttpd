@@ -13,6 +13,7 @@
 #include "singleton.h"
 #include "configure.h"
 #include "access.h"
+#include "mutex.h"
 
 enum STATUS
 {
@@ -32,6 +33,8 @@ public:
 
     Server();
     ~Server();
+
+    Mutex gLock;
     
 private:
     Configure configure_;

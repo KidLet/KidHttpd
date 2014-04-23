@@ -16,10 +16,10 @@ Connection::Connection() :
     writeBufLen = 0;
     hasWriteLen = 0;
     hasFileLen = 0;
+    hasTailLen = 0;
     
     state_ = close;
 
-    
 }
 
 void Connection::setReactor(Reactor* ReactorPtr)
@@ -35,7 +35,10 @@ Reactor* Connection::getReactor()
 
 void Connection::onRead()
 {
-    int len = sock->recv(readBuf + readBufLen, 256);
+    if(state_ == close)
+        return ;
+
+    int len = sock->recv(readBuf + readBufLen, 65536 - readBufLen);
     readBufLen += len;
     Debug << "Read Len: " << len << endl;
 
@@ -45,11 +48,17 @@ void Connection::onRead()
         return ;
     }
 
-    handleLogic(len);
+    if(len > 0)
+        handleLogic(len);
 }
 
 void Connection::onWrite()
 {
+    if(state_ == close)
+        return ;
+
+    const char *ptr = "\r\n\r\n";
+
     if(hasWriteLen < writeBufLen)
     {
         Debug << "Write Header!" << endl;
@@ -61,25 +70,64 @@ void Connection::onWrite()
     }
     else
     {
-        Debug << endl << string(writeBuf, hasFileLen) << endl;
+        Debug << "Write Content!" << endl;
+        //Debug << endl << string(writeBuf, hasFileLen) << endl;
         HttpRespond::fileInfo info;
 
         int iRet = respond.isGetFile(&info);
         if(iRet == 0)
         {
-            iRet = sendfile(sock->getFd(), info.fd, NULL, info.fileSize);
-            if(iRet >= 0)
+
+            if(hasFileLen)//文件发送完毕后追加结尾\r\n\r\n
             {
-                sock->send("\r\n\r\n", 4);
-                onClose();
+                Debug << "Write Content Tail!" << endl;
+                iRet = sock->send(ptr + hasTailLen, 4 - hasTailLen);
+                if(iRet > 0)
+                {
+                    hasTailLen += iRet;
+                }
+
+                if(hasTailLen == 4)
+                    onClose();
+
+                return ;
+                
+            }
+            
+            errno = 0;
+            iRet = sendfile(sock->getFd(), info.fd, NULL, info.fileSize);
+
+
+            if(errno == EAGAIN)
+                Debug << "EAGAIN" << endl;
+            else if(errno == EBADF)
+                Debug << "EBADF" << endl;
+            else if(errno == EFAULT)
+                Debug << "EFAULT" << endl;
+            else if(errno == EINVAL )
+                Debug << "EINVAL" << endl;
+            else if(errno == EIO)
+                Debug << "EIO" << endl;
+            
+            if(iRet >= 0)//文件数据发送完毕
+            {
+
+                assert(info.fileSize ==(unsigned int) iRet);
+                
+                hasFileLen = info.fileSize;
+                ::close(info.fd);
+                
             }
             else
             {
+                Check;
+                Debug << "sendfile SockFD: " << sock->getFd() << " file fd:" << info.fd << endl;
                
             }
         }
         else
         {
+            //myReactorPtr->poller->ctl(sock->getFd(), EventType::R);
             onClose();
         }
         
@@ -90,22 +138,15 @@ void Connection::onWrite()
 
 void Connection::onClose()
 {
-    //myReactorPtr->connMap.erase(sock->getFd());
     if(state_ == close)
     {
         return ;
     }
     state_ = close;
-    myReactorPtr->poller->del(sock->getFd());
+    //myReactorPtr->poller->del(sock->getFd());
+    //myReactorPtr->connMap.erase(sock->getFd());
 
-    HttpRespond::fileInfo info;
-    int iRet = respond.isGetFile(&info);
-
-    if(iRet == 0)
-    {
-        ::close(info.fd);
-    }
-    Debug << endl;
+    Debug << sock->getFd() << endl;
     
 }
 
