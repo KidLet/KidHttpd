@@ -5,7 +5,7 @@
  *
  * 历史：
  * 2014-3-2 首次编写
- *
+ * 2014-4-23 添加多文档支持
  */
 #ifndef __CONNECTION_H__
 #define __CONNECTION_H__
@@ -32,8 +32,6 @@ public:
     HttpRequest request;
     HttpRespond respond;
     
-
-
     unique_ptr<Socket> sock;
 
 private:

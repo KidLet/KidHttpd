@@ -8,12 +8,12 @@
  *
  */
 #include "server.h"
+#include "util.h"
 
 Server::Server() : configure_()
 {
     status_ = INIT;
     proxy_= NULL;
-
     configure_.parseFile("conf/http.conf");
 }
 
@@ -25,7 +25,15 @@ Server::~Server()
 
 int Server::start()
 {
-    proxy_ = new Access(2);
+    int reactors_num = 2;
+
+    if(toint(configure_.getValue("reactors_num")) > 1)
+    {
+        reactors_num = 1 + toint(configure_.getValue("reactors_num"));
+    }
+
+    
+    proxy_ = new Access(reactors_num);
 
     proxy_->start();
 

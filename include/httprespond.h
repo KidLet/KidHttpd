@@ -5,12 +5,13 @@
  *
  * 历史：
  * 2014-4-10 首次编写
- *
+ * 2014-4-23 添加 Modify 支持
  */
 #ifndef __HTTPRESPOND_H__
 #define __HTTPRESPOND_H__
 
 #include "http.h"
+#include "httprequest.h"
 
 class HttpRespond : public Http
 {
@@ -32,8 +33,10 @@ public:
     void notFound();
     void notImplement();
     void serverError();
+    void notModified();
+    void buildBase(time_t lastModify = -1);
 
-    int resFile(const string& path);
+    int resFile(const string& path, HttpRequest& myReq);
     int isGetFile(fileInfo* info);
 
 

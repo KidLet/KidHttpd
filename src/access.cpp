@@ -49,7 +49,7 @@ int Access::listen()
     iRet = listenSock_.bind("0.0.0.0", 8080);
     assert(iRet == 0);
     
-    listenSock_.listen(1024);
+    listenSock_.listen(10240);
     return 0;
 }
 

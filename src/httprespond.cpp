@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <ctime>
 
 
 map<string, string> HttpRespond::mapContentType;
@@ -25,10 +26,10 @@ void HttpRespond::setPhrase(const string& text)
 
 void HttpRespond::notFound()
 {
-    version = Http11;
+    buildBase();
+    
     stateCode = 404;
     setPhrase("not found");
-    setHeader("connection", "close");
     setHeader("Content-Type", "text/html");
 
     string text = "<html><body>not found</body></html>";
@@ -42,10 +43,10 @@ void HttpRespond::notFound()
 
 void HttpRespond::notImplement()
 {
-    version = Http11;
+    buildBase();
+    
     stateCode = 501;
     setPhrase("not Implement");
-    setHeader("connection", "close");
     setHeader("Content-Type", "text/html");
 
     string text = "<html><body>not Implement</body></html>";
@@ -57,12 +58,30 @@ void HttpRespond::notImplement()
     
 }
 
+// 生成基本的回包头格式
+void HttpRespond::buildBase(time_t lastModify)
+{
+    time_t now = time(NULL);
+
+    if(lastModify != -1)
+    {
+        setHeader("Last-Modified", timeToStr(lastModify));
+    }
+    
+    version = Http11;
+    setHeader("connection", "close");
+    setHeader("Server", "KidHttpd/0.1");
+    setHeader("Date", timeToStr(now));
+    content.clear();
+    
+}
+
 void HttpRespond::serverError()
 {
-    version = Http11;
+    buildBase();
+    
     stateCode = 500;
     setPhrase("Server Error");
-    setHeader("connection", "close");
     setHeader("Content-Type", "text/html");
 
     string text = "<html><body>Server Error</body></html>";
@@ -70,6 +89,16 @@ void HttpRespond::serverError()
     content.assign(text.begin(), text.end());
     setHeader("Content-Length", tostr<size_t>(content.size()) );
 
+    info_.fd = -1;
+    
+}
+
+void HttpRespond::notModified()
+{
+    buildBase();
+    
+    stateCode = 304;
+    setPhrase("Not Modified");
     info_.fd = -1;
     
 }
@@ -126,7 +155,7 @@ string HttpRespond::getContentType(const string& ext ="")
 
 
 
-int HttpRespond::resFile(const string& path)
+int HttpRespond::resFile(const string& path, HttpRequest& myReq)
 {
     int fd = open(path.c_str(), O_RDONLY);
     if(fd < 0)
@@ -150,16 +179,34 @@ int HttpRespond::resFile(const string& path)
         return -2;
     }
 
+    if(myReq.getHeader("If-Modified-Since") != "")
+    {
+        Debug << "Last Time: " << strToTime(myReq.getHeader("If-Modified-Since")) << endl;
+        Debug << "Modify Time: " << statBuf.st_mtime << endl;
+
+        time_t mtime = statBuf.st_mtime;
+        struct tm* tmMtime = gmtime(&mtime);
+        
+        if( strToTime(myReq.getHeader("If-Modified-Since")) >= mktime(tmMtime) )
+        {
+            ::close(fd);
+            notModified();
+            return 0;
+            
+        }
+    }
+
     fileSize = statBuf.st_size;
     info_.fd = fd;
     info_.fileSize = fileSize;
     
     content.clear();
 
-    version = Http11;
+
+    buildBase(statBuf.st_mtime);
+    
     stateCode = 200;
     setPhrase("ok");
-    setHeader("connection", "close");
 
     vector<string> vecFile;
     

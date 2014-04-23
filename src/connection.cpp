@@ -177,18 +177,20 @@ void Connection::handleRespond()
 {
     if(request.getMethod() == HttpRequest::GET)
     {
+
+        Configure& conf = *Server::getInstance()->getConf();
         
-        if(respond.resFile(Server::getInstance()->getConf()->getValue("path") + request.getURI()) != 0)
+        if(respond.resFile(conf.getValue("path") + request.getURI(), request) != 0)
         {
             vector<string> vecFile;
-            Split(Server::getInstance()->getConf()->getValue("default_files").c_str(), ",", vecFile);
+            Split(conf.getValue("default_files").c_str(), ",", vecFile);
 
             auto it = vecFile.begin();
 
             for(; it!=vecFile.end(); it++)
             {
-                if(respond.resFile(Server::getInstance()->getConf()->getValue("path") +
-                                   request.getURI() + "/" + *it ) == 0)
+                if(respond.resFile(conf.getValue("path") +
+                                   request.getURI() + "/" + *it, request ) == 0)
                     break;
 
             }
