@@ -10,7 +10,7 @@
 #define __SINGLETON_H__
 
 #include "common.h"
-#include <unistd.h>
+#include "mutex.h"
 
 template <class T>
 class Singleton
@@ -22,23 +22,31 @@ protected:
     Singleton(){};    
     
 private:
-    static T* _pInstance;
+    static T* pInstance_;
+    static Mutex mutex_;
 
 };
 
 template <class T>
-T* Singleton<T>::_pInstance = NULL;
+T* Singleton<T>::pInstance_ = NULL;
+
+template <class T>
+Mutex Singleton<T>::mutex_;
 
 template <class T>
 T* Singleton<T>::getInstance()
 {
-    if(_pInstance == NULL)
+    if(pInstance_ == NULL)
     {
-	usleep(10000);
-	return (_pInstance = new T);	
+        mutex_.lock();
+        if(pInstance_ == NULL)
+            pInstance_ = new T;
+        mutex_.unlock();
+
+        return pInstance_ ;	
     }
     else
-	return _pInstance;
+        return pInstance_;
 }
 
 #endif
