@@ -31,3 +31,20 @@ int Split(const char* str, const char* delimeter, vector<string>& vec)
     return vec.size();
     
 }
+
+string timeToStr(const time_t time)
+{
+    struct tm* tmGMT = gmtime(&time);
+    char str[32];
+    strftime(str, 31, "%a, %d %b %Y %X GMT", tmGMT);
+    return string(str);
+    
+    
+}
+time_t strToTime(const string& str)
+{
+    struct tm tmGMT;
+    strptime(str.c_str(), "%a, %d %b %Y %X GMT", &tmGMT);
+    return mktime(&tmGMT);
+}
+       

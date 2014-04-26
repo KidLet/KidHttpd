@@ -56,7 +56,7 @@ int HttpRequest::parse(char* ptr, size_t len)
                 return -1;
             }
 
-            Debug << "Method:" << method_ << " uri: " << uri_ << " version: " << version << endl;
+            //Debug << "Method:" << method_ << " uri: " << uri_ << " version: " << version << endl;
             
         }
         else
@@ -66,7 +66,7 @@ int HttpRequest::parse(char* ptr, size_t len)
                 return -1;
             
             setHeader(vecStr[0], vecStr[1]);
-            Debug << "key:" << vecStr[0] << " value:" << vecStr[1] << endl;
+            //Debug << "key:" << vecStr[0] << " value:" << vecStr[1] << endl;
         }
     }
 

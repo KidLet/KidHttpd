@@ -46,6 +46,7 @@ Socket::~Socket()
         ::close(iFd_);
         iFd_ = -1;
     }
+    Debug << "Socket: " << iFd_ << " Delete" << endl;
 }
 
 int Socket::setReUse(bool bIsReUse)
@@ -189,14 +190,14 @@ int Socket::shutdown(int iHow)
     return ::shutdown(iFd_, iHow);
 }
 
-int Socket::send(void* pvBuf, size_t iLen)
+int Socket::send(const void* pvBuf, size_t iLen)
 {
-    return ::write(iFd_, pvBuf, iLen);
+    return ::write(iFd_, (void*) pvBuf, iLen);
 }
 
-int Socket::recv(void* pvBuf, size_t iLen)
+int Socket::recv(const void* pvBuf, size_t iLen)
 {
-    return ::read(iFd_, pvBuf, iLen);
+    return ::read(iFd_, (void*)pvBuf, iLen);
 }
 
 int Socket::setBlock(bool isBlock)

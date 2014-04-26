@@ -9,9 +9,11 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
+#include "common.h"
 #include "singleton.h"
 #include "configure.h"
 #include "access.h"
+#include "mutex.h"
 
 enum STATUS
 {
@@ -27,8 +29,12 @@ public:
     int start();
     int stop();
 
+    Configure* getConf(){return &configure_;}
+
     Server();
     ~Server();
+
+    Mutex gLock;
     
 private:
     Configure configure_;

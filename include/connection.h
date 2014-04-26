@@ -5,7 +5,7 @@
  *
  * 历史：
  * 2014-3-2 首次编写
- *
+ * 2014-4-23 添加多文档支持
  */
 #ifndef __CONNECTION_H__
 #define __CONNECTION_H__
@@ -13,6 +13,7 @@
 #include "common.h"
 #include "socket.h"
 #include "httprequest.h"
+#include "httprespond.h"
 #include <string>
 #include <vector>
 
@@ -22,15 +23,15 @@ class Connection
 {
 public:
     Connection();
+    ~Connection(){Debug<<"Connection out , FD:" << sock->getFd() << endl;}
+    
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
+    int getStatus(){return state_;}
 
     HttpRequest request;
     HttpRespond respond;
     
-
-
-    ~Connection(){Debug<<"Connection out" << endl;}
     unique_ptr<Socket> sock;
 
 private:
@@ -43,14 +44,20 @@ private:
     
     char writeBuf[65536];
     int writeBufLen;
+    int hasWriteLen;
+    ssize_t hasFileLen;
+
+    int hasTailLen;
 
     void onRead();
+    void onWrite();
     void onClose();
     
     void handleLogic(int len);
     void handleGetHeader(int len);
     void handleGetContent(int len);
     void handleRespond();
+    void handleWrite();
 
     enum State
     {

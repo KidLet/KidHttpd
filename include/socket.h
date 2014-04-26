@@ -33,8 +33,8 @@ public:
     int bind(const string& sBindIp, unsigned int iPort);
     int listen(int iBackLog = 1024);
 
-    int recv(void* pvBuf, size_t iLen);
-    int send(void* pvBuf, size_t iLen);
+    int recv(const void* pvBuf, size_t iLen);
+    int send(const void* pvBuf, size_t iLen);
 
     static int parseAddr(const string& sAddr, struct in_addr& stInAddr);
     

@@ -9,6 +9,7 @@
  */
 #include "access.h"
 #include "epoll.h"
+#include "server.h"
 
 #include <memory>
 #include <vector>
@@ -49,7 +50,7 @@ int Access::listen()
     iRet = listenSock_.bind("0.0.0.0", 8080);
     assert(iRet == 0);
     
-    listenSock_.listen(1024);
+    listenSock_.listen(10240);
     return 0;
 }
 
@@ -68,11 +69,21 @@ int Access::eventLoop()
 
 void Access::onConnection(int fd)
 {
+    Server::getInstance()->gLock.lock();
+    static int num = 0;
     int clientFd;
 
     shared_ptr<Connection> clientConnPtr(new Connection());
-    Debug << "accept:" << listenSock_.accept( *(clientConnPtr->sock.get()), 0) << endl;
+    int iRet = listenSock_.accept( *(clientConnPtr->sock.get()), 0);
+
+    if(iRet)
+    {
+        Check;
+    }
+    assert(iRet == 0);
+    
     Debug << "FD:" << clientConnPtr->sock->getFd() << endl;
+    Debug << "client num:" << ++num << endl;
 
     clientFd = clientConnPtr->sock->getFd();
     
@@ -81,5 +92,7 @@ void Access::onConnection(int fd)
 
     clientConnPtr->getReactor()->connMap[clientFd] = clientConnPtr;
     clientConnPtr->getReactor()->poller->add( clientFd, EventType::R );
+
+    Server::getInstance()->gLock.unlock();
     
 }

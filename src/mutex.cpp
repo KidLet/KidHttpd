@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "mutex.h"
+#include "common.h"
 
 using namespace std;
 
@@ -41,6 +42,8 @@ Mutex::~Mutex() {
 
 void Mutex::lock() {
 	int rc = pthread_mutex_lock(&mutex_);
+
+    Check;
 	assert(rc == 0);
 }
 

@@ -19,6 +19,7 @@ public:
     EPoll();
     virtual ~EPoll();
     int add(int fd, int type);
+    int ctl(int fd, int type);
     int del(int fd);
     int poll(int timeOut, vector<Event>& vecEventList);
 private:
