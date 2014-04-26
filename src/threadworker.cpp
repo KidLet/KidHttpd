@@ -16,7 +16,7 @@ ThreadWorker::ThreadWorker(ThreadPool* pool) {
 }
 
 ThreadWorker::~ThreadWorker() {
-	terminate();
+
 }
 
 void ThreadWorker::run() {
@@ -40,7 +40,7 @@ void ThreadWorker::run() {
 void ThreadWorker::terminate() {
 	running_ = false;
 	join();
-	pool_->notifyAll();
+	pool_->notifyAll(); //why?
 }
 
 

@@ -10,7 +10,6 @@
 #define THREADWORKER_H_
 
 #include "thread.h"
-#include "task.h"
 
 class ThreadPool;
 

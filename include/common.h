@@ -28,6 +28,6 @@ using namespace std;
 
 #define Debug cout << __FILE__ << " Line:" << __LINE__ << " Func:" << __FUNCTION__ << " | " 
 #define Check if(errno) {cout << "Have Error: "; perror(NULL);}
-
+typedef std::function<void()> Task;
 
 #endif

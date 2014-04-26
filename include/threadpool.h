@@ -5,16 +5,15 @@
  *
  * 历史：
  *  2014年4月5日 首次编写
- *  2014年4月9日 增加线程池动态优化
+ *  2014年4月9日 增加线程池动态优化参数
  */
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
-#include "task.h"
 #include "queue.h"
 #include "threadworker.h"
 #include "threadlock.h"
-#include "threadmonitor.h"
+//#include "threadmonitor.h"
 
 #include <pthread.h>
 #include <vector>
@@ -27,7 +26,7 @@ public:
 	ThreadPool();
 	~ThreadPool();
 
-	void init(int min, int max);
+	void init(int num);
 	void start();
 	void stop(); //参考tax的pool的stop
 	void clear();
@@ -41,18 +40,27 @@ public:
 	void notifyAll();
 
 	void adjust(); 	//动态调整线程池大小
+
+	void settNum(size_t num) { tNum = num; }
+	//void setMinAvailNum(size_t min) { minAvailNum = min; }
+	//void setMaxAvailNum(size_t max) { maxAvailNum = max; }
+	size_t getSize() { return tNum; }
+	//size_t getMinAvail() { return minAvailNum; }
+	//size_t getMaxAvail() { return maxAvailNum; }
+
+	friend class ThreadWorker;
 private:
 	size_t tNum;	//线程池初始化大小
-	size_t minAvailNum;
+	/*size_t minAvailNum;
 	size_t maxAvailNum;
 	size_t liveNum;
-	size_t busyNum;
+	size_t busyNum;*/
 
 	bool running_; 	//thread pool的运行状态
 
 	ThreadLock pmutex_; //thread pool的互斥锁
-	//MutexLock counter_; //线程计数器
-	ThreadMonitor* monitor_; //监控线程池并进行动态优化
+	//ThreadLock counter_; //线程计数器
+	//ThreadMonitor* monitor_; //监控线程池并进行动态优化
 
 	Queue<Task*> jobQueue;
 	Queue<Task*> startQueue;

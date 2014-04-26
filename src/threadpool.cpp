@@ -13,11 +13,11 @@
 ThreadPool::ThreadPool() {
 	running_ = false;
 	tNum = 0;
-	minAvailNum = 0;
+/*	minAvailNum = 0;
 	maxAvailNum = 0;
 	liveNum = 0;
 	busyNum = 0;
-	monitor_ = new ThreadMonitor(this);
+	monitor_ = new ThreadMonitor(this);*/
 }
 
 ThreadPool::~ThreadPool() {
@@ -27,15 +27,15 @@ ThreadPool::~ThreadPool() {
 	}
 }
 
-void ThreadPool::init(int min, int max) {
+void ThreadPool::init(int num) {
 	stop();
 	Lock lock(*this);
 	clear();
-	tNum = min;
-	minAvailNum = min;
+	tNum = num;
+/*	minAvailNum = min;
 	maxAvailNum = max;
 	busyNum = 0;
-	liveNum = min;
+	liveNum = min;*/
 
 	for(size_t i = 0; i < tNum; i++)
 		jobThread.push_back(new ThreadWorker(this));
@@ -48,7 +48,7 @@ void ThreadPool::start() {
 		(*it)->start();
 		it++;
 	}
-	monitor_->start();
+	//monitor_->start();
 	running_ = true;
 }
 
