@@ -110,7 +110,7 @@ void ThreadPool::clearQueue() {
 	jobQueue.clear();
 }
 
-bool ThreadPool::finished() const {
+bool ThreadPool::finished() {
 	return startQueue.empty() && jobQueue.empty() && busyThread.empty();
 }
 

@@ -36,7 +36,7 @@ public:
 	void idle(ThreadWorker* thread);	//将指定线程置为空闲线程
 	void add(Task* task);
 	void clearQueue();
-	bool finished() const; //判断任务队列中的任务是否都已经完成
+	bool finished(); //判断任务队列中的任务是否都已经完成
 	void notifyAll();
 
 	void adjust(); 	//动态调整线程池大小

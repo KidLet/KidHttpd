@@ -41,16 +41,13 @@ void Cond::wait(Mutex& mutex) {
 bool Cond::timedwait(Mutex& mutex, int millsecond) {
 	timespec time = abstime(millsecond);
 	int rc = pthread_cond_timedwait(&cond_, &mutex.mutex_, &time);
-	//cout<<rc<<endl;
-	if(rc) {
-		Check;
-	}
+    if(rc)
+    {
+        if(rc == ETIMEDOUT)
+            return false;
 
-	if(rc == ETIMEDOUT)
-		cout<<"time pout"<<endl;
-	if(rc == EINTR)
-		cout<<"interrupted"<<endl;
-	//assert(rc == 0);
+        assert(rc == 0);
+    }
 
 	return (rc == 0);
 }
