@@ -18,6 +18,8 @@ ThreadPool::ThreadPool() {
 	liveNum = 0;
 	busyNum = 0;
 	monitor_ = new ThreadMonitor(this);*/
+	jobQueue.clear();
+	startQueue.clear();
 }
 
 ThreadPool::~ThreadPool() {
@@ -56,10 +58,13 @@ void ThreadPool::stop() {
 	Lock lock(*this);
 	vector<ThreadWorker*>::iterator it = jobThread.begin();
 	while(it != jobThread.end()) {
-		if((*it)->isAlive())
+		if((*it)->isAlive()) {
 			(*it)->terminate();
+			cout<<"terminate"<<endl;
+		}
 		it++;
 	}
+	cout<<"terminate all"<<endl;
 	running_ = false;
 }
 
