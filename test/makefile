@@ -16,8 +16,6 @@ LIB_DIR			=  -L./../lib
 
 all: $(EXE)
 
-include $(patsubst %.cpp, %.d, $(SRC))
-
 
 %.test: %.o $(filter-out ./../src/main.o, $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp)))
 #	@echo $(filter-out %main.o, $(patsubst %.cpp, %.o, $(wildcard ./../src/*.cpp)))

@@ -27,7 +27,7 @@ using namespace std;
 #endif
 
 #define Debug cout << __FILE__ << " Line:" << __LINE__ << " Func:" << __FUNCTION__ << " | " 
-#define Check if(errno) {cout << "Have Error: "; perror(NULL);}
+#define Check if(errno) {cout << "Have Error: "; perror(NULL); cout << endl;}
 typedef std::function<void()> Task;
 
 #endif
