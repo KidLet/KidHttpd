@@ -15,7 +15,13 @@ const int n = 1000000;
 Task testTask[n];
 
 void Test(int num) {
-	cout<<num<<endl;
+	int j;
+	cout << "go !" << endl;
+
+	for(int i=1; i<1000; i++)
+	{
+		j = (i+j)%7;
+	}
 }
 
 void test(int size) {
