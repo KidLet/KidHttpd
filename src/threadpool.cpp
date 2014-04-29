@@ -10,6 +10,10 @@
  */
 #include "threadpool.h"
 
+
+time_t startTime;
+
+
 ThreadPool::ThreadPool() {
 	running_ = false;
 	tNum = 0;
@@ -36,6 +40,9 @@ void ThreadPool::init(int num) {
 
 void ThreadPool::start() {
 	Lock lock(*this);
+
+	startTime = time(NULL);
+
 	vector<ThreadWorker*>::iterator it = jobThread.begin();
 	while(it != jobThread.end()) {
 		(*it)->start();
@@ -87,12 +94,15 @@ Task* ThreadPool::get(ThreadWorker* thread) {
 void ThreadPool::idle(ThreadWorker* thread) {
 	Lock lock(pmutex_);
 	busyThread.erase(thread);
-	if(busyThread.empty())
+	if(busyThread.empty()){
 		pmutex_.notifyAll();
+		if(jobQueue.empty())
+			cout << "cost:" << (time(NULL) - startTime) <<"s"<< endl;
+	}
 }
 
 void ThreadPool::add(Task* task) {
-	if(running_)
+	//if(running_)
 		jobQueue.push_back(task);
 }
 
