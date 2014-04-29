@@ -14,10 +14,10 @@
 template <class T>
 class LockT {
 public:
-	LockT(const T& mutex) : mutex_(mutex) { mutex_.lock(); }
+	LockT(T& mutex) : mutex_(mutex) { mutex_.lock(); }
 	~LockT() { mutex_.unlock(); }
 private:
-	T mutex_;
+	T& mutex_;
 };
 
 #endif /* LOCK_H_ */

@@ -31,9 +31,9 @@ public:
     void push_front(queue_type& qt);
 
     void notifyT();		//通知等待在队列的所有线程都醒来
-    size_t size() const;
+    size_t size();
     void clear();
-    bool empty() const;
+    bool empty();
 
 private:
     queue_type queue_;
@@ -111,7 +111,7 @@ void Queue<T, D>::notifyT() {
 }
 
 template<typename T, typename D>
-size_t Queue<T, D>::size() const {
+size_t Queue<T, D>::size() {
 	Lock lock(*this);
 	return size_;
 }
@@ -124,7 +124,7 @@ void Queue<T, D>::clear() {
 }
 
 template<typename T, typename D>
-bool Queue<T, D>::empty() const {
+bool Queue<T, D>::empty() {
 	Lock lock(*this);
 	return queue_.empty();
 }

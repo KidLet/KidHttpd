@@ -11,7 +11,7 @@ void Test(int num)
 
 int main()
 {
-    pool.init(1);
+    pool.init(100);
     pool.start();
 
     Task testTask[1000];
