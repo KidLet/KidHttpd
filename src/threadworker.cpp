@@ -31,7 +31,6 @@ void ThreadWorker::run() {
 		task = pool_->get(this);
 		if(task) {
 			(*task)();
-			cout<<"Thread id: "<<pid_<<endl;
 			pool_->idle(this);
 		}
 	}
@@ -41,7 +40,6 @@ void ThreadWorker::run() {
 void ThreadWorker::terminate() {
 	running_ = false;
 	join();
-	cout<<"join"<<endl;
 	pool_->notifyAll();
 }
 

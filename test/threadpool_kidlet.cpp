@@ -11,24 +11,22 @@ void Test(int num)
 
 int main()
 {
-    pool.init(100);
+    pool.init(500);
     pool.start();
 
-    Task testTask[1000];
-    for(int i=0; i<1000; i++)
+    Task testTask[2000];
+    for(int i=0; i<2000; i++)
     {
         testTask[i] = std::bind(Test, i);
         pool.add(&testTask[i]);
-        //testTask[i]();
         
     }
 
-    
 
     
-    while(1);
+    //while(1);
 
-    //pool.stop();
+    pool.stop();
     
     return 0;
 }

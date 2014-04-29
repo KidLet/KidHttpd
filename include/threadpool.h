@@ -13,7 +13,6 @@
 #include "queue.h"
 #include "threadworker.h"
 #include "threadlock.h"
-//#include "threadmonitor.h"
 
 #include <pthread.h>
 #include <vector>
@@ -39,28 +38,16 @@ public:
 	bool finished(); //判断任务队列中的任务是否都已经完成
 	void notifyAll();
 
-	void adjust(); 	//动态调整线程池大小
-
 	void settNum(size_t num) { tNum = num; }
-	//void setMinAvailNum(size_t min) { minAvailNum = min; }
-	//void setMaxAvailNum(size_t max) { maxAvailNum = max; }
 	size_t getSize() { return tNum; }
-	//size_t getMinAvail() { return minAvailNum; }
-	//size_t getMaxAvail() { return maxAvailNum; }
 
 	friend class ThreadWorker;
 private:
 	size_t tNum;	//线程池初始化大小
-	/*size_t minAvailNum;
-	size_t maxAvailNum;
-	size_t liveNum;
-	size_t busyNum;*/
 
 	bool running_; 	//thread pool的运行状态
 
 	ThreadLock pmutex_; //thread pool的互斥锁
-	//ThreadLock counter_; //线程计数器
-	//ThreadMonitor* monitor_; //监控线程池并进行动态优化
 
 	Queue<Task*> jobQueue;
 	Queue<Task*> startQueue;

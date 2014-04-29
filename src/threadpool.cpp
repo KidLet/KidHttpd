@@ -13,11 +13,6 @@
 ThreadPool::ThreadPool() {
 	running_ = false;
 	tNum = 0;
-/*	minAvailNum = 0;
-	maxAvailNum = 0;
-	liveNum = 0;
-	busyNum = 0;
-	monitor_ = new ThreadMonitor(this);*/
 	jobQueue.clear();
 	startQueue.clear();
 }
@@ -34,10 +29,6 @@ void ThreadPool::init(int num) {
 	Lock lock(*this);
 	clear();
 	tNum = num;
-/*	minAvailNum = min;
-	maxAvailNum = max;
-	busyNum = 0;
-	liveNum = min;*/
 
 	for(size_t i = 0; i < tNum; i++)
 		jobThread.push_back(new ThreadWorker(this));
@@ -50,7 +41,7 @@ void ThreadPool::start() {
 		(*it)->start();
 		it++;
 	}
-	//monitor_->start();
+
 	running_ = true;
 }
 
@@ -60,7 +51,6 @@ void ThreadPool::stop() {
 	while(it != jobThread.end()) {
 		if((*it)->isAlive()) {
 			(*it)->terminate();
-			cout<<"terminate"<<endl;
 		}
 		it++;
 	}
@@ -118,6 +108,3 @@ void ThreadPool::notifyAll() {
 	jobQueue.notifyT();
 }
 
-void ThreadPool::adjust() {
-
-}

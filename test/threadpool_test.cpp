@@ -11,26 +11,24 @@
 using namespace std;
 
 
-void printString() {
-	//cout<<str<<endl;
-	int sum = 1+1;
-	cout<<sum<<endl;
-	//usleep(100);
+void Test(int num) {
+	cout<<num<<endl;
 }
 
 void test(int size) {
 	ThreadPool pool;
 	pool.init(size);
-	pool.start();
+    pool.start();
 
-/*	for(int i = 0; i < 10; i++) {
-		string buf = "Task: " + tostr<int>(i);
-		cout<<buf<<endl;
-		Task t = std::bind(printString);
-		pool.add(&t);
-	}
-	cout<<"exit"<<endl;*/
-	pool.stop();
+    int n = 10000;
+    Task testTask[n];
+    for(int i=0; i<n; i++)
+    {
+        testTask[i] = std::bind(Test, i);
+        pool.add(&testTask[i]);
+    }
+
+    pool.stop();
 }
 
 int main() {

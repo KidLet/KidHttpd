@@ -35,7 +35,7 @@ Cond::~Cond() {
 
 void Cond::wait(Mutex& mutex) {
 	int rc = pthread_cond_wait(&cond_, &mutex.mutex_);
-	//assert(rc == 0);
+	assert(rc == 0);
 }
 
 bool Cond::timedwait(Mutex& mutex, int millsecond) {
