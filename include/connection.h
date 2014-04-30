@@ -15,6 +15,7 @@
 #include "httprequest.h"
 #include "httprespond.h"
 #include "mutex.h"
+#include "cond.h"
 
 #include <string>
 #include <vector>
@@ -55,8 +56,8 @@ private:
     void onWrite();
     void onClose();
     
-    void handleLogic(int len);
-    void handleGetHeader(int len);
+    void handleLogic();
+    bool handleGetHeader();
     void handleGetContent(int len);
     void handleRespond();
     void handleWrite();
@@ -77,6 +78,7 @@ private:
     size_t contentEndPos;
 
     Mutex mutex_;
+    Cond cond_;
 
 
     

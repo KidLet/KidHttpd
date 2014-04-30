@@ -21,12 +21,17 @@ Connection::Connection() :
     
     state_ = close;
 
+
 }
 
 void Connection::setReactor(Reactor* ReactorPtr)
 {
     myReactorPtr = ReactorPtr;
     state_ = connect;
+
+    Task* task = new Task();
+    *task = std::bind(&Connection::handleLogic, this);
+    Server::getInstance()->getPool()->add( task );
 }
 
 Reactor* Connection::getReactor()
@@ -49,15 +54,9 @@ void Connection::onRead()
         return ;
     }
 
-    if(len > 0)
+    if(len > 0 && state_ != close)
     {
-        handleLogic(len);
-
-        return ;
-        
-        Task* task = new Task();
-        *task = std::bind(&Connection::handleLogic, this, len);
-        Server::getInstance()->getPool()->add( task );
+        cond_.signal();
     }
 }
 
@@ -150,6 +149,7 @@ void Connection::onClose()
     {
         return ;
     }
+    cond_.signal();
     state_ = close;
     //myReactorPtr->poller->del(sock->getFd());
     //myReactorPtr->connMap.erase(sock->getFd());
@@ -158,23 +158,35 @@ void Connection::onClose()
     
 }
 
-void Connection::handleLogic(int len = 0)
+void Connection::handleLogic()
 {
     Debug << "Have Lock:" << pthread_self() <<  endl;
-    LockT<Mutex> lock(mutex_);
+    //LockT<Mutex> lock(mutex_);
+
     while(1)
     {
+
         switch(state_)
         {
             case connect:
-                handleGetHeader(len);
+                if(handleGetHeader())
+                    break;
+                else
+                {
+                    mutex_.lock();
+                    cond_.wait(mutex_);
+                    mutex_.unlock();
+                }
                 break;
+                
             case reqHeader:
                 handleRespond();
                 break;
+
             case resWrite:
                 handleWrite();
                 return ;
+
             case error:
                 Debug << "Http Error" << endl;
                 return ;
@@ -185,9 +197,11 @@ void Connection::handleLogic(int len = 0)
         }
         
     }
+
+    
 }
 
-void Connection::handleGetHeader(int len)
+bool Connection::handleGetHeader()
 {
     
     string tmp (readBuf, readBufLen);
@@ -206,11 +220,14 @@ void Connection::handleGetHeader(int len)
         {
             state_ = error;
         }
+
+        return true;
         //handleLogic();
     }
     else
     {
         Debug << "no found header end flag" << endl;;
+        return false;
     }
     
 }
@@ -269,6 +286,6 @@ void Connection::handleRespond()
 
 void Connection::handleWrite()
 {
-    myReactorPtr->poller->ctl(sock->getFd(), EventType::RW);
+    myReactorPtr->poller->ctl(sock->getFd(), EventType::W);
    
 }
