@@ -14,6 +14,7 @@
 #include "configure.h"
 #include "access.h"
 #include "mutex.h"
+#include "threadpool.h"
 
 enum STATUS
 {
@@ -30,6 +31,7 @@ public:
     int stop();
 
     Configure* getConf(){return &configure_;}
+    ThreadPool* getPool(){return pool_;}
 
     Server();
     ~Server();
@@ -40,6 +42,7 @@ private:
     Configure configure_;
     bool status_;
     Access* proxy_;
+    ThreadPool* pool_;
 
 };
 

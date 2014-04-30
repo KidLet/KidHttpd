@@ -14,6 +14,8 @@
 #include "socket.h"
 #include "httprequest.h"
 #include "httprespond.h"
+#include "mutex.h"
+
 #include <string>
 #include <vector>
 
@@ -73,6 +75,8 @@ private:
     State state_;
     size_t headerEndPos;
     size_t contentEndPos;
+
+    Mutex mutex_;
 
 
     
