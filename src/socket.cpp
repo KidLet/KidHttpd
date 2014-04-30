@@ -122,10 +122,19 @@ int Socket::accept(Socket& client, bool isBlock)
     socklen_t iSockLen;
     int iRet;
 
+    /*
     if(isBlock)
         iRet = ::accept4(iFd_, (struct sockaddr*) &stSockAddrIn, &iSockLen, 0);
     else 
         iRet = ::accept4(iFd_, (struct sockaddr*) &stSockAddrIn, &iSockLen, SOCK_NONBLOCK);
+    */
+
+    iRet = ::accept(iFd_, (struct sockaddr*) &stSockAddrIn, &iSockLen);
+    if(!iRet)
+    {
+        setBlock(0);
+    }
+    
 
     Debug << "Socket::accept fd:" << iFd_ << endl;
     if(iRet >= 0)
