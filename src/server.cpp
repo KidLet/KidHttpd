@@ -26,16 +26,25 @@ Server::~Server()
 int Server::start()
 {
     int reactors_num = 2;
+    int worker_num = 10;
 
     if(toint(configure_.getValue("reactors_num")) > 1)
     {
         reactors_num = 1 + toint(configure_.getValue("reactors_num"));
     }
 
+    if(toint(configure_.getValue("worker_num")) > 0)
+    {
+        worker_num = toint(configure_.getValue("worker_num"));
+    }
     
     proxy_ = new Access(reactors_num);
+    pool_ = new ThreadPool();
+    pool_->init(worker_num);
+    
 
     proxy_->start();
+    pool_->start();
 
     while(status_ != STOPED)
     {

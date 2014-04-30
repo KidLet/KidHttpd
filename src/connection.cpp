@@ -2,6 +2,7 @@
 #include "reactor.h"
 #include "server.h"
 #include "util.h"
+#include "lock.h"
 
 #include <string>
 #include <sys/types.h>
@@ -49,7 +50,15 @@ void Connection::onRead()
     }
 
     if(len > 0)
+    {
         handleLogic(len);
+
+        return ;
+        
+        Task* task = new Task();
+        *task = std::bind(&Connection::handleLogic, this, len);
+        Server::getInstance()->getPool()->add( task );
+    }
 }
 
 void Connection::onWrite()
@@ -120,7 +129,6 @@ void Connection::onWrite()
             }
             else
             {
-                Check;
                 Debug << "sendfile SockFD: " << sock->getFd() << " file fd:" << info.fd << endl;
                
             }
@@ -152,24 +160,30 @@ void Connection::onClose()
 
 void Connection::handleLogic(int len = 0)
 {
-    switch(state_)
+    Debug << "Have Lock:" << pthread_self() <<  endl;
+    LockT<Mutex> lock(mutex_);
+    while(1)
     {
-        case connect:
-            handleGetHeader(len);
-            break;
-        case reqHeader:
-            handleRespond();
-            break;
-        case resWrite:
-            handleWrite();
-            break;
-        case error:
-            Debug << "Http Error" << endl;
-            return ;
-        case close:
-            return ;
-        default:
-            break;
+        switch(state_)
+        {
+            case connect:
+                handleGetHeader(len);
+                break;
+            case reqHeader:
+                handleRespond();
+                break;
+            case resWrite:
+                handleWrite();
+                return ;
+            case error:
+                Debug << "Http Error" << endl;
+                return ;
+            case close:
+                return ;
+            default:
+                return ;
+        }
+        
     }
 }
 
@@ -192,7 +206,7 @@ void Connection::handleGetHeader(int len)
         {
             state_ = error;
         }
-        handleLogic();
+        //handleLogic();
     }
     else
     {
@@ -250,7 +264,6 @@ void Connection::handleRespond()
         state_ = resWrite;
         
     }
-    handleLogic();
     
 }
 

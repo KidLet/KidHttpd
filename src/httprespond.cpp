@@ -161,7 +161,7 @@ int HttpRespond::resFile(const string& path, HttpRequest& myReq)
     if(fd < 0)
     {
         return -1; 
-        Check;
+        //Check;
     }
 
     unsigned long fileSize = -1;

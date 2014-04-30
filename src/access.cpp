@@ -10,6 +10,7 @@
 #include "access.h"
 #include "epoll.h"
 #include "server.h"
+#include "util.h"
 
 #include <memory>
 #include <vector>
@@ -47,7 +48,11 @@ int Access::listen()
 
     listenSock_.setReUse();
     listenSock_.setBlock(0);
-    iRet = listenSock_.bind("0.0.0.0", 8080);
+
+    Configure* conf = Server::getInstance()->getConf();
+
+    iRet = listenSock_.bind(conf->getValue("address"),
+                            toint<string>(conf->getValue("port")));
     assert(iRet == 0);
     
     listenSock_.listen(10240);
@@ -76,10 +81,6 @@ void Access::onConnection(int fd)
     shared_ptr<Connection> clientConnPtr(new Connection());
     int iRet = listenSock_.accept( *(clientConnPtr->sock.get()), 0);
 
-    if(iRet)
-    {
-        Check;
-    }
     assert(iRet == 0);
     
     Debug << "FD:" << clientConnPtr->sock->getFd() << endl;
