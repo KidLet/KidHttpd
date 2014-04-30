@@ -84,7 +84,7 @@ Task* ThreadPool::get() {
 
 Task* ThreadPool::get(ThreadWorker* thread) {
 	Task* task = NULL;
-	if(!jobQueue.pop_front(task, 1000))
+	if(!jobQueue.pop_front(task, -1))
 		return NULL;
 	Lock lock(pmutex_);
 	busyThread.insert(thread);
