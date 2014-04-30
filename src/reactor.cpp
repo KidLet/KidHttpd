@@ -35,7 +35,8 @@ int Reactor::loop(int timeOut)
     {
 
         Server::getInstance()->gLock.lock();
-        if(connMap.find(list[i].fd) != connMap.end() && connMap[list[i].fd]->getStatus() == Connection::State::close )
+        if(connMap.find(list[i].fd) != connMap.end() && connMap[list[i].fd]->getStatus() == Connection::State::close
+           && connMap[list[i].fd]->getWorkerState() == 1)
         {
             Debug << "Erase connMap fd:" << list[i].fd << endl;
             poller->del(list[i].fd);
@@ -48,7 +49,7 @@ int Reactor::loop(int timeOut)
 
         if(list[i].type == EventType::RW)
         {
-            Debug << "ReadWrite Event fd:" << list[i].fd << endl;
+            //Debug << "ReadWrite Event fd:" << list[i].fd << endl;
             if(this->writeCB_)
                 this->writeCB_(list[i].fd);
             if(this->readCB_)
@@ -56,16 +57,16 @@ int Reactor::loop(int timeOut)
         }
         else if(list[i].type == EventType::W)
         {
-            Debug << "Write Event fd:" << list[i].fd << endl;
+            //Debug << "Write Event fd:" << list[i].fd << endl;
             if(this->writeCB_)
                 this->writeCB_(list[i].fd);
         }
         else
         {
-            Debug << "read Event fd:" << list[i].fd << endl;
+            //Debug << "read Event fd:" << list[i].fd << endl;
             if(this->readCB_)
             {
-                Debug << "excute read Event fd:" << list[i].fd << endl;
+                //Debug << "excute read Event fd:" << list[i].fd << endl;
                 this->readCB_(list[i].fd);
             }
         }
@@ -74,7 +75,7 @@ int Reactor::loop(int timeOut)
     }
 
 
-    Debug << "Cur have " << connMap.size() << " Connections" << endl;
+    //Debug << "Cur have " << connMap.size() << " Connections" << endl;
 
 
     return 0;

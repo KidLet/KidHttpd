@@ -31,6 +31,7 @@ public:
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
     int getStatus(){return state_;}
+    int getWorkerState(){return workerState_;}
 
     HttpRequest request;
     HttpRespond respond;
@@ -74,6 +75,7 @@ private:
     };
 
     State state_;
+    int workerState_;
     size_t headerEndPos;
     size_t contentEndPos;
 

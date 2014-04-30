@@ -10,7 +10,6 @@
 #include <sys/sendfile.h>
 #include <fcntl.h>
 
-Mutex mutexExit;
 
 Connection::Connection() :
         sock(new Socket())
@@ -20,6 +19,8 @@ Connection::Connection() :
     hasWriteLen = 0;
     hasFileLen = 0;
     hasTailLen = 0;
+
+    workerState_ = -1;
     
     state_ = close;
 
@@ -44,11 +45,14 @@ Reactor* Connection::getReactor()
 void Connection::onRead()
 {
     if(state_ == close)
+    {
+        onClose();
         return ;
+    }
 
     int len = sock->recv(readBuf + readBufLen, 65536 - readBufLen);
     readBufLen += len;
-    Debug << "Read Len: " << len << endl;
+    //Debug << "Read Len: " << len << endl;
 
     if(len == 0)
     {
@@ -56,7 +60,7 @@ void Connection::onRead()
         return ;
     }
 
-    if(len > 0 && state_ != close)
+    if(len > 0)
     {
         cond_.signal();
     }
@@ -65,7 +69,10 @@ void Connection::onRead()
 void Connection::onWrite()
 {
     if(state_ == close)
+    {
+        onClose();
         return ;
+    }
 
     const char *ptr = "\r\n\r\n";
 
@@ -80,7 +87,7 @@ void Connection::onWrite()
     }
     else
     {
-        Debug << "Write Content!" << endl;
+        //Debug << "Write Content!" << endl;
         //Debug << endl << string(writeBuf, hasFileLen) << endl;
         HttpRespond::fileInfo info;
 
@@ -90,7 +97,7 @@ void Connection::onWrite()
 
             if(hasFileLen)//文件发送完毕后追加结尾\r\n\r\n
             {
-                Debug << "Write Content Tail!" << endl;
+                //Debug << "Write Content Tail!" << endl;
                 iRet = sock->send(ptr + hasTailLen, 4 - hasTailLen);
                 if(iRet > 0)
                 {
@@ -104,21 +111,8 @@ void Connection::onWrite()
                 
             }
             
-            errno = 0;
             iRet = sendfile(sock->getFd(), info.fd, NULL, info.fileSize);
 
-
-            if(errno == EAGAIN)
-                Debug << "EAGAIN" << endl;
-            else if(errno == EBADF)
-                Debug << "EBADF" << endl;
-            else if(errno == EFAULT)
-                Debug << "EFAULT" << endl;
-            else if(errno == EINVAL )
-                Debug << "EINVAL" << endl;
-            else if(errno == EIO)
-                Debug << "EIO" << endl;
-            
             if(iRet >= 0)//文件数据发送完毕
             {
 
@@ -128,15 +122,9 @@ void Connection::onWrite()
                 ::close(info.fd);
                 
             }
-            else
-            {
-                Debug << "sendfile SockFD: " << sock->getFd() << " file fd:" << info.fd << endl;
-               
-            }
         }
         else
         {
-            //myReactorPtr->poller->ctl(sock->getFd(), EventType::R);
             onClose();
         }
         
@@ -149,6 +137,7 @@ void Connection::onClose()
 {
     if(state_ == close)
     {
+        cond_.signal();
         return ;
     }
     cond_.signal();
@@ -161,16 +150,11 @@ void Connection::onClose()
 Connection::~Connection()
 {
     Debug<<"Connection out , FD:" << sock->getFd() << endl;
-    assert(state_ == close);
-    cond_.signal();
-    mutexExit.lock();
-    mutexExit.unlock();
 }
 
 void Connection::handleLogic()
 {
-    Debug << "Have Lock:" << pthread_self() <<  endl;
-    LockT<Mutex> lock(mutexExit);
+    workerState_ = 0;
 
     while(1)
     {
@@ -182,8 +166,10 @@ void Connection::handleLogic()
                     break;
                 else
                 {
+                    if(state_ == close)
+                        break;
                     mutex_.lock();
-                    cond_.wait(mutex_);
+                    cond_.timedwait(mutex_, 100);
                     mutex_.unlock();
                 }
                 break;
@@ -194,19 +180,23 @@ void Connection::handleLogic()
 
             case resWrite:
                 handleWrite();
+                workerState_ = 1;
                 return ;
 
             case error:
-                Debug << "Http Error" << endl;
+                workerState_ = 1;
                 return ;
             case close:
+                workerState_ = 1;
                 return ;
             default:
+                workerState_ = 1;
                 return ;
         }
         
     }
 
+    workerState_ = 1;
     
 }
 

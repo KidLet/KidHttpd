@@ -14,7 +14,7 @@
 
 CC          	=  gcc
 CXX         	=  g++-4.8
-CFLAGS      	+= -g -fPIC -Wno-deprecated -Wall -Werror -std=gnu++0x
+CFLAGS      	+= -o3 -g -fPIC -Wno-deprecated -Wall -Werror -std=gnu++0x
 
 SRC 			=  $(wildcard ./src/*.cpp)
 OBJ 			=  $(patsubst %.cpp,%.o,$(SRC))
@@ -32,7 +32,7 @@ all: $(EXE)
 -include ./make.rules
 
 $(EXE): $(OBJ)
-	$(CXX) $(OBJ) -o KidHttpd $(INCLUDE) $(LIB_DIR) $(LIB)
+	$(CXX) $(CFLAG) $(OBJ) -o KidHttpd $(INCLUDE) $(LIB_DIR) $(LIB)
 
 clean:
 	@echo 'clean the project'

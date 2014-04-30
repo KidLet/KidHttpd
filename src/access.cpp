@@ -75,24 +75,24 @@ int Access::eventLoop()
 void Access::onConnection(int fd)
 {
     Server::getInstance()->gLock.lock();
-    static int num = 0;
     int clientFd;
+    int iRet = 0;
 
-    shared_ptr<Connection> clientConnPtr(new Connection());
-    int iRet = listenSock_.accept( *(clientConnPtr->sock.get()), 0);
+    while(iRet == 0)
+    {
+        shared_ptr<Connection> clientConnPtr(new Connection());
+        iRet = listenSock_.accept( *(clientConnPtr->sock.get()), 0);
+        if(iRet)
+            break;
 
-    assert(iRet == 0);
-    
-    Debug << "FD:" << clientConnPtr->sock->getFd() << endl;
-    Debug << "client num:" << ++num << endl;
+        clientFd = clientConnPtr->sock->getFd();
 
-    clientFd = clientConnPtr->sock->getFd();
-    
 
-    clientConnPtr->setReactor( reactorsPtr[ clientFd %(reactorNum-1)+1] );
+        clientConnPtr->setReactor( reactorsPtr[ clientFd %(reactorNum-1)+1] );
 
-    clientConnPtr->getReactor()->connMap[clientFd] = clientConnPtr;
-    clientConnPtr->getReactor()->poller->add( clientFd, EventType::R );
+        clientConnPtr->getReactor()->connMap[clientFd] = clientConnPtr;
+        clientConnPtr->getReactor()->poller->add( clientFd, EventType::R );
+    }
 
     Server::getInstance()->gLock.unlock();
     
