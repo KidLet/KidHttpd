@@ -10,6 +10,8 @@
 #include <sys/sendfile.h>
 #include <fcntl.h>
 
+Mutex mutexExit;
+
 Connection::Connection() :
         sock(new Socket())
 {
@@ -151,17 +153,24 @@ void Connection::onClose()
     }
     cond_.signal();
     state_ = close;
-    //myReactorPtr->poller->del(sock->getFd());
-    //myReactorPtr->connMap.erase(sock->getFd());
 
     Debug << sock->getFd() << endl;
     
 }
 
+Connection::~Connection()
+{
+    Debug<<"Connection out , FD:" << sock->getFd() << endl;
+    assert(state_ == close);
+    cond_.signal();
+    mutexExit.lock();
+    mutexExit.unlock();
+}
+
 void Connection::handleLogic()
 {
     Debug << "Have Lock:" << pthread_self() <<  endl;
-    //LockT<Mutex> lock(mutex_);
+    LockT<Mutex> lock(mutexExit);
 
     while(1)
     {
@@ -226,7 +235,7 @@ bool Connection::handleGetHeader()
     }
     else
     {
-        Debug << "no found header end flag" << endl;;
+        Debug << "no found header end flag| read len:" << readBufLen << "|FD:" << sock->getFd() << endl;;
         return false;
     }
     
@@ -271,6 +280,7 @@ void Connection::handleRespond()
         }
         respond.encode(writeBuf, writeBufLen);
         Debug << endl <<string(writeBuf, writeBufLen) << endl;
+        Debug << "FD: " << sock->getFd() << endl;
         state_ = resWrite;
     }
     else

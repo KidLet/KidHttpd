@@ -43,7 +43,6 @@ Mutex::~Mutex() {
 void Mutex::lock() {
 	int rc = pthread_mutex_lock(&mutex_);
 
-    Check;
 	assert(rc == 0);
 }
 

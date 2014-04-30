@@ -26,7 +26,7 @@ class Connection
 {
 public:
     Connection();
-    ~Connection(){Debug<<"Connection out , FD:" << sock->getFd() << endl;}
+    ~Connection();
     
     void setReactor(Reactor* ReactorPtr);
     Reactor* getReactor();
