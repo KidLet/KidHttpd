@@ -23,6 +23,7 @@ public:
     };
 
     HttpRespond();
+    ~HttpRespond();
 
     int stateCode;
     void setPhrase(const string& text);

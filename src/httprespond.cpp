@@ -17,6 +17,15 @@ HttpRespond::HttpRespond()
     info_.fd = -1;
 }
 
+HttpRespond::~HttpRespond()
+{
+    if(info_.fd != -1)
+    {
+        ::close(info_.fd);
+        info_.fd = -1;
+    }
+}
+
 
 void HttpRespond::setPhrase(const string& text)
 {
@@ -181,8 +190,8 @@ int HttpRespond::resFile(const string& path, HttpRequest& myReq)
 
     if(myReq.getHeader("If-Modified-Since") != "")
     {
-        Debug << "Last Time: " << strToTime(myReq.getHeader("If-Modified-Since")) << endl;
-        Debug << "Modify Time: " << statBuf.st_mtime << endl;
+        //Debug << "Last Time: " << strToTime(myReq.getHeader("If-Modified-Since")) << endl;
+        //Debug << "Modify Time: " << statBuf.st_mtime << endl;
 
         time_t mtime = statBuf.st_mtime;
         struct tm* tmMtime = gmtime(&mtime);

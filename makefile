@@ -32,7 +32,7 @@ all: $(EXE)
 -include ./make.rules
 
 $(EXE): $(OBJ)
-	$(CXX) $(CFLAG) $(OBJ) -o KidHttpd $(INCLUDE) $(LIB_DIR) $(LIB)
+	$(CXX) $(CFLAGS) $(OBJ) -o KidHttpd $(INCLUDE) $(LIB_DIR) $(LIB)
 
 clean:
 	@echo 'clean the project'

@@ -53,6 +53,7 @@ void Connection::onRead()
     int len = sock->recv(readBuf + readBufLen, 65536 - readBufLen);
     readBufLen += len;
     //Debug << "Read Len: " << len << endl;
+    //cerr << "Read Len:" << len << endl;
 
     if(len == 0)
     {
@@ -95,7 +96,7 @@ void Connection::onWrite()
         if(iRet == 0)
         {
 
-            if(hasFileLen)//文件发送完毕后追加结尾\r\n\r\n
+            if((unsigned int)hasFileLen == info.fileSize)//文件发送完毕后追加结尾\r\n\r\n
             {
                 //Debug << "Write Content Tail!" << endl;
                 iRet = sock->send(ptr + hasTailLen, 4 - hasTailLen);
@@ -110,18 +111,18 @@ void Connection::onWrite()
                 return ;
                 
             }
-            
-            iRet = sendfile(sock->getFd(), info.fd, NULL, info.fileSize);
-
-            if(iRet >= 0)//文件数据发送完毕
+            else
             {
+                iRet = sendfile(sock->getFd(), info.fd, NULL, info.fileSize-hasFileLen);
 
-                assert(info.fileSize ==(unsigned int) iRet);
-                
-                hasFileLen = info.fileSize;
-                ::close(info.fd);
+                if(iRet >= 0)//文件数据发送完毕
+                {
+                    hasFileLen += iRet;
+
+                }
                 
             }
+            
         }
         else
         {
@@ -140,8 +141,9 @@ void Connection::onClose()
         cond_.signal();
         return ;
     }
-    cond_.signal();
+
     state_ = close;
+    cond_.signal();
 
     Debug << sock->getFd() << endl;
     
@@ -166,11 +168,14 @@ void Connection::handleLogic()
                     break;
                 else
                 {
+                    //Debug << "No Found Header" << endl;
                     if(state_ == close)
                         break;
+                    //usleep(20);
                     mutex_.lock();
-                    cond_.timedwait(mutex_, 100);
+                    cond_.timedwait(mutex_, 50);
                     mutex_.unlock();
+                    
                 }
                 break;
                 
@@ -225,7 +230,7 @@ bool Connection::handleGetHeader()
     }
     else
     {
-        Debug << "no found header end flag| read len:" << readBufLen << "|FD:" << sock->getFd() << endl;;
+        //Debug << "no found header end flag| read len:" << readBufLen << "|FD:" << sock->getFd() << endl;;
         return false;
     }
     
@@ -269,8 +274,8 @@ void Connection::handleRespond()
                 respond.notFound();
         }
         respond.encode(writeBuf, writeBufLen);
-        Debug << endl <<string(writeBuf, writeBufLen) << endl;
-        Debug << "FD: " << sock->getFd() << endl;
+        //Debug << endl <<string(writeBuf, writeBufLen) << endl;
+        //Debug << "FD: " << sock->getFd() << endl;
         state_ = resWrite;
     }
     else
@@ -286,6 +291,6 @@ void Connection::handleRespond()
 
 void Connection::handleWrite()
 {
-    myReactorPtr->poller->ctl(sock->getFd(), EventType::W);
+    myReactorPtr->poller->ctl(sock->getFd(), EventType::RW);
    
 }
