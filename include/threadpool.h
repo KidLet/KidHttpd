@@ -38,7 +38,7 @@ public:
 	bool finished(); //判断任务队列中的任务是否都已经完成
 	void notifyAll();
 
-	void settNum(size_t num) { tNum = num; }
+	void setTNum(size_t num) { tNum = num; }
 	size_t getSize() { return tNum; }
 
 	friend class ThreadWorker;
