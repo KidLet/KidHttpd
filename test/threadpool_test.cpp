@@ -10,41 +10,39 @@
 #include "util.h"
 using namespace std;
 
-
-const int n = 1000000;
+const int n = 30000000;
 Task testTask[n];
 
-void Test(int num) {
+void run(int num) {
 	int j;
-	cout << "go !" << endl;
-
 	for(int i=1; i<1000; i++)
 	{
 		j = (i+j)%7;
+		j = j*i;
 	}
 }
 
 void test(int size) {
 	ThreadPool pool;
 	pool.init(size);
-    pool.start();
-
+	//Task* task;
 
     for(int i=0; i<n; i++)
     {
-        testTask[i] = std::bind(Test, i);
+        testTask[i] = std::bind(run, i);
+        //task = new Task();
+        //*task = std::bind(run, i);
         pool.add(&testTask[i]);
+        //pool.add(task);
     }
-
+    pool.start();
     while(1) sleep(1);
 
-    //pool.stop();
 }
 
 int main() {
-    //test(0);
-    test(1);
-    //test(2);
+    //test(1);
+    test(2);
     //test(10);
     //test(50);
 	return 0;

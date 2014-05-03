@@ -61,7 +61,7 @@ void ThreadPool::stop() {
 		}
 		it++;
 	}
-	cout<<"terminate all"<<endl;
+	//cout<<"terminate all"<<endl;
 	running_ = false;
 }
 

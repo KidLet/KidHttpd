@@ -20,19 +20,22 @@ ThreadWorker::~ThreadWorker() {
 }
 
 void ThreadWorker::run() {
+
     Debug << "worker start id:" << id() << endl;
+/*
 	Task* task = pool_->get();
 	if(task) {
 		(*task)();
-		delete task;
+		//delete task;
 		task = NULL;
 	}
-
+*/
+	Task* task;
 	while(running_) {
 		task = pool_->get(this);
 		if(task) {
 			(*task)();
-            delete task;
+            //delete task;
 			pool_->idle(this);
 		}
 	}
