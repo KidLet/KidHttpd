@@ -11,7 +11,7 @@
 #include "threadtester.h"
 using namespace std;
 
-const int n = 30000000;
+const int n = 1000000;
 Task testTask[n];
 ThreadTester* tester[n];
 

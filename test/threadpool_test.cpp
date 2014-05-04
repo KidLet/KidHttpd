@@ -10,7 +10,7 @@
 #include "util.h"
 using namespace std;
 
-const int n = 30000000;
+const int n = 1000000;
 Task testTask[n];
 
 void run(int num) {
